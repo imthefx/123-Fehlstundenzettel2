@@ -2052,8 +2052,8 @@ window.addEventListener('resize', fillNumberLayers);
       var token = getFDToken();
       if (!token) { resolve(null); return; }
       var code = LEAGUE_CODES[leagueKey] || 'PL';
-      var url = 'https://api.football-data.org/v4/competitions/' + code + '/matches?status=SCHEDULED';
-      fetch(url, { headers: { 'X-Auth-Token': token } })
+      var url = 'http://localhost:3000/api/football/' + code;
+      fetch(url)
         .then(function(res){ if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
         .then(function(data){
           var matches = Array.isArray(data.matches) ? data.matches : [];
