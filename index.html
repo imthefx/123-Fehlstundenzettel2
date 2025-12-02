@@ -2052,7 +2052,7 @@ window.addEventListener('resize', fillNumberLayers);
       var token = getFDToken();
       if (!token) { resolve(null); return; }
       var code = LEAGUE_CODES[leagueKey] || 'PL';
-      var url = 'http://localhost:3000/api/football/' + code;
+      var url = 'https://one23-fehlstundenzettel2.onrender.com/api/football/' + code;
       fetch(url)
         .then(function(res){ if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
         .then(function(data){
@@ -17125,7 +17125,7 @@ document.addEventListener("keydown", (e) => {
     if(!token){ setInfo('Kein Token gesetzt – zeige Fallback‑Spieltag.'); return []; }
     const comp = leagueMap[leagueKey];
     if(!comp){ setInfo('Unbekannte Liga – zeige Fallback‑Spieltag.'); return []; }
-    const url = `http://localhost:3000/api/football/${comp}`;
+    const url = `https://one23-fehlstundenzettel2.onrender.com/api/football/${comp}`;
     try{
       const res = await fetch(url, { headers: { 'X-Auth-Token': token } });
       if(!res.ok){ console.warn('football-data HTTP', res.status, res.statusText); setInfo(`API-Fehler (${res.status}) – Fallback.`); return []; }
