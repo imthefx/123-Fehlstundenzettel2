@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <!-- Favicon: 123 branding -->
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="12" fill="%2301222b"/%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"%3E%3Cstop offset="0" stop-color="%23e6f3ff"/%3E%3Cstop offset="1" stop-color="%23b3e5fc"/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x="32" y="36" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" fill="url(%23g)"%3E123%3C/text%3E%3C/svg%3E' />
+  <!-- PNG fallback for older browsers -->
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAABQ2C5HAAAACXBIWXMAAAsSAAALEgHS3X78AAAAI0lEQVR4nO3OwQkAMAwEwQqf/5c3gY1mJ5JmA1q3gYzC3T5bqf7mJw3c1M9gQ7QG+6cJwAAAABJRU5ErkJggg==" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Meine Website</title>
+<title>123 ist die Zahl</title>
 
 <style>
 body {
@@ -1492,14 +1496,63 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
 #inventar-controls .spacer { flex: 1 1 auto; }
 
 /* BP Name Color Effects (Chat + Previews) */
-@keyframes santaPulseGlow { 0%,100% { text-shadow: 0 0 4px rgba(211,47,47,0.4), 0 0 10px rgba(211,47,47,0.35); } 50% { text-shadow: 0 0 10px rgba(211,47,47,0.9), 0 0 24px rgba(211,47,47,0.7); } }
-.santa-text { color:#D32F2F; animation: santaPulseGlow 1.8s ease-in-out infinite; font-weight:700; }
+@keyframes santaPulseGlow {
+  0%, 100% {
+    text-shadow: 0 0 2px rgba(211,47,47,0.30), 0 0 6px rgba(211,47,47,0.22);
+  }
+  50% {
+    text-shadow: 0 0 6px rgba(211,47,47,0.55), 0 0 12px rgba(211,47,47,0.40);
+  }
+}
+.santa-text { color:#D32F2F; animation: santaPulseGlow 2.2s ease-in-out infinite; font-weight:600; }
 
-@keyframes hollyPulseGlow { 0%,100% { text-shadow: 0 0 4px rgba(27,94,32,0.4), 0 0 10px rgba(27,94,32,0.35); } 50% { text-shadow: 0 0 10px rgba(27,94,32,0.9), 0 0 24px rgba(255,0,0,0.45); } }
-.holly-text { color:#1B5E20; animation: hollyPulseGlow 2s ease-in-out infinite; font-weight:700; }
+@keyframes hollyPulseGlow {
+  0%, 100% {
+    text-shadow: 0 0 2px rgba(27,94,32,0.28), 0 0 6px rgba(27,94,32,0.20);
+  }
+  50% {
+    text-shadow: 0 0 6px rgba(27,94,32,0.50), 0 0 10px rgba(255,0,0,0.25);
+  }
+}
+.holly-text { color:#1B5E20; animation: hollyPulseGlow 2.4s ease-in-out infinite; font-weight:600; }
 
-@keyframes icyShimmerFlow { 0% { background-position: 200% 0; text-shadow: 0 0 6px rgba(179,229,252,0.6), 0 0 14px rgba(179,229,252,0.35);} 100% { background-position: -200% 0; text-shadow: 0 0 10px rgba(179,229,252,0.9), 0 0 26px rgba(179,229,252,0.6);} }
-.icy-text { color: transparent; background: linear-gradient(90deg, #ffffff, #B3E5FC, #ffffff); -webkit-background-clip: text; background-clip: text; background-size:200% 100%; animation: icyShimmerFlow 2.2s linear infinite; font-weight:700; }
+@keyframes icyShimmerFlow {
+  0% {
+    background-position: 150% 0;
+    text-shadow: 0 0 3px rgba(179,229,252,0.40), 0 0 8px rgba(179,229,252,0.24);
+  }
+  100% {
+    background-position: -150% 0;
+    text-shadow: 0 0 5px rgba(179,229,252,0.55), 0 0 12px rgba(179,229,252,0.36);
+  }
+}
+.icy-text { color: transparent; background: linear-gradient(90deg, #ffffff, #B3E5FC, #ffffff); -webkit-background-clip: text; background-clip: text; background-size:200% 100%; animation: icyShimmerFlow 3s linear infinite; font-weight:600; }
+
+/* Auto-apply effects without JS based on data-color-id */
+.message .name[data-color-id="santa"],
+.color-preview .color-preview-label[data-color-id="santa"] {
+  color:#D32F2F;
+  animation: santaPulseGlow 2.2s ease-in-out infinite;
+  font-weight:600;
+}
+
+.message .name[data-color-id="holly"],
+.color-preview .color-preview-label[data-color-id="holly"] {
+  color:#1B5E20;
+  animation: hollyPulseGlow 2.4s ease-in-out infinite;
+  font-weight:600;
+}
+
+.message .name[data-color-id="icy"],
+.color-preview .color-preview-label[data-color-id="icy"] {
+  color: transparent;
+  background: linear-gradient(90deg, #ffffff, #B3E5FC, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size:200% 100%;
+  animation: icyShimmerFlow 3s linear infinite;
+  font-weight:600;
+}
 
 /* Advent Calendar Styles */
 .advent-door {
@@ -16244,6 +16297,43 @@ document.addEventListener("keydown", (e) => {
   });
 })();
 </script>
+<!-- Auto-apply chat glow effects based on computed color -->
+<script>
+  (function(){
+    function colorToId(rgb){
+      // Normalize input
+      const v = (rgb||'').replace(/\s+/g,'').toLowerCase();
+      // Map known RGBs
+      if (v === 'rgb(211,47,47)' || v === 'rgba(211,47,47,1)') return 'santa';
+      if (v === 'rgb(27,94,32)' || v === 'rgba(27,94,32,1)') return 'holly';
+      if (v === 'rgb(179,229,252)' || v === 'rgba(179,229,252,1)') return 'icy';
+      return null;
+    }
+
+    function applyIds(){
+      try {
+        const names = document.querySelectorAll('.message .name');
+        names.forEach(el => {
+          const cs = getComputedStyle(el);
+          const id = colorToId(cs.color);
+          if (id) el.setAttribute('data-color-id', id);
+        });
+        const labels = document.querySelectorAll('.color-preview .color-preview-label');
+        labels.forEach(el => {
+          const cs = getComputedStyle(el);
+          const id = colorToId(cs.color);
+          if (id) el.setAttribute('data-color-id', id);
+        });
+      } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      applyIds();
+      const obs = new MutationObserver(applyIds);
+      obs.observe(document.body, { childList:true, subtree:true });
+    });
+  })();
+</script>
 </body>
 </html>
 <!-- Advent enhancements: badge + confetti + toast -->
@@ -16309,6 +16399,7 @@ document.addEventListener("keydown", (e) => {
 <script>
   function showToast(msg) {
     let t = document.getElementById('toast');
+<!-- (Removed temporary animated effects script; will integrate inline) -->
     if (!t) {
       t = document.createElement('div');
       t.id = 'toast';
