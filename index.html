@@ -2182,10 +2182,27 @@ const MATCHDAY_FIXTURES = {
   ]
 };
 
-function loadMatchday() {
+async function loadMatchday() {
   const leagueEl = document.getElementById('leagueSelect');
   const league = leagueEl ? leagueEl.value : 'EPL';
   const fixtures = MATCHDAY_FIXTURES[league] || [];
+  const uid = getCurrentUid();
+  
+  // Load existing bets for this user and league
+  let userBets = {};
+  if (uid && window.__matchdayDb) {
+    try {
+      const betsCol = collection(__matchdayDb, 'footballBets', uid, 'bets');
+      const q = query(betsCol, where('league', '==', league));
+      const snap = await getDocs(q);
+      snap.forEach(doc => {
+        const data = doc.data();
+        userBets[data.matchId] = data;
+      });
+    } catch (e) {
+      console.error('Error loading bets:', e);
+    }
+  }
   const list = document.getElementById('fixturesList');
   const info = document.getElementById('matchdayInfo');
 
@@ -2198,27 +2215,27 @@ function loadMatchday() {
   }
 
   let html = '';
+  // Get user's current coins for max stake
+  const userCoins = window.getUserCoins ? window.getUserCoins() : 9999;
   fixtures.forEach(m => {
     const d = new Date(m.kickoff);
     const locked = Date.now() >= m.kickoff;
     html += `
-      <div style="border:1px solid #ddd; border-radius:8px; padding:10px; background:#fafafa;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="font-weight:600;">${m.home} vs. ${m.away}</div>
-          <div style="font-size:12px; opacity:0.7;">${d.toLocaleString()}</div>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
-          <input type="number" min="1" placeholder="Einsatz 🪙" id="stake-${m.id}" style="width:110px; padding:6px;" ${locked ? 'disabled' : ''} />
-          <select id="tendency-${m.id}" style="padding:6px;" ${locked ? 'disabled' : ''}>
-            <option value="">Tendenz wählen (1X2)</option>
+      <div style="border:1px solid #ddd; border-radius:8px; padding:12px; background:#fafafa;">
+        <div style="font-weight:600; margin-bottom:8px;">${m.home} vs. ${m.away}</div>
+        <div style="font-size:12px; opacity:0.7; margin-bottom:8px;">Kickoff: ${d.toLocaleString()}</div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <input type="number" min="1" max="${userCoins}" placeholder="Einsatz 🪙" id="stake-${m.id}" style="width:60px; padding:6px;" ${locked ? 'disabled' : ''} />
+          <select id="tendency-${m.id}" style="padding:6px; width:140px;" ${locked ? 'disabled' : ''}>
+            <option value="">Tendenz (1X2)</option>
             <option value="1">Heimsieg</option>
             <option value="X">Unentschieden</option>
             <option value="2">Auswärtssieg</option>
           </select>
-          <input type="text" placeholder="Exaktes Ergebnis z.B. 2:1" id="score-${m.id}" style="flex:1; padding:6px;" ${locked ? 'disabled' : ''} />
-          <button onclick="placeBet('${league}','${m.id}')" ${locked ? 'disabled' : ''} style="padding:6px 10px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer;">Wetten</button>
+          <input type="text" placeholder="Ergebnis z.B. 2:1" id="score-${m.id}" style="width:120px; padding:6px;" ${locked ? 'disabled' : ''} />
+          <button onclick="placeBet('${league}','${m.id}')" ${locked ? 'disabled' : ''} style="padding:6px 16px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">Wetten</button>
         </div>
-        ${locked ? '<div style="margin-top:6px; color:#e74c3c; font-size:12px;">Wetten gesperrt (Spiel läuft/gestartet)</div>' : ''}
+        ${locked ? '<div style="margin-top:8px; color:#e74c3c; font-size:12px;">Wetten gesperrt (Spiel läuft/gestartet)</div>' : ''}
       </div>
     `;
   });
@@ -2246,10 +2263,11 @@ async function placeBet(league, matchId) {
 
   if (!stake || stake <= 0) { if (feedbackEl) feedbackEl.textContent = 'Bitte Einsatz angeben.'; return; }
 
-  try {
-    // Abzug coins
-    await addCoinsSimple(-stake);
+  // Check if user has enough coins
+  const userCoins = window.getUserCoins ? window.getUserCoins() : 0;
+  if (stake > userCoins) { if (feedbackEl) feedbackEl.textContent = 'Nicht genug Münzen!'; return; }
 
+  try {
     const betsCol = collection(__matchdayDb, 'footballBets', uid, 'bets');
     const betRef = doc(betsCol);
     await setDoc(betRef, {
@@ -2265,10 +2283,16 @@ async function placeBet(league, matchId) {
       status: 'pending'
     });
 
-    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#28a745;">✅ Wette platziert!</span>';
-    if (stakeEl) stakeEl.value = '';
-    if (tendEl) tendEl.value = '';
-    if (scoreEl) scoreEl.value = '';
+    // Deduct coins after successful bet placement
+    await addCoins(-stake);
+
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#28a745;">✅ Wette platziert! ' + stake + ' 🪙 abgezogen.</span>';
+    
+    // Reload display to show bet as placed
+    setTimeout(() => {
+      loadMatchday();
+      if (feedbackEl) feedbackEl.innerHTML = '';
+    }, 1500);
   } catch (e) {
     console.error('Bet error', e);
     if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">Fehler beim Wetten.</span>';
@@ -3053,7 +3077,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <!-- Matchday Tips (Top 5 Ligen) -->
-    <div class="card game-item" id="matchdayTipsCard">
+    <div class="card game-item" style="min-width:360px; flex:0 0 360px;">
       <button id="setApiTokenBtn" style="float:right; margin-top:-8px; margin-right:-8px; background:#007bff; color:#fff; border-radius:6px; border:none; padding:6px 12px; font-size:13px; cursor:pointer; display:none;">API Token</button>
       <script>
       // Button nur für Admin sichtbar machen (UID-Liste oder Flag)
@@ -3135,7 +3159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <button id="refreshLocksBtn" onclick="refreshMatchLocks()" style="padding:6px 10px;">🔄 Aktualisieren</button>
       </div>
       <div id="matchdayInfo" style="font-size:12px; opacity:0.7; margin-bottom:8px;"></div>
-      <div id="fixturesList" style="display:grid; grid-template-columns: 1fr; gap:10px;"></div>
+      <div id="fixturesList" style="display:flex; flex-direction:column; gap:12px;"></div>
       <div id="betFeedback" style="margin-top:10px; font-weight:bold; font-size:14px;"></div>
     </div>
 
@@ -5401,6 +5425,11 @@ async function addCoins(amount) {
     console.error("Fehler beim Speichern der Münzen:", err);
   }
 }
+
+// Helper: Get current user coins (for bet max validation)
+window.getUserCoins = function() {
+  return userCoins || 0;
+};
 
 // Battle Pass Quest Progress updaten
 async function updateBPQuestProgress(questType, value = 1) {
