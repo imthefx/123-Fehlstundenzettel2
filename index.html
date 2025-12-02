@@ -3054,7 +3054,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Matchday Tips (Top 5 Ligen) -->
     <div class="card game-item" id="matchdayTipsCard">
+      <button id="setApiTokenBtn" style="float:right; margin-top:-8px; margin-right:-8px; background:#007bff; color:#fff; border-radius:6px; border:none; padding:6px 12px; font-size:13px; cursor:pointer; display:none;">API Token</button>
+      <script>
+      // Button nur für Admin sichtbar machen (UID-Liste oder Flag)
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('setApiTokenBtn');
+        // Admin-UIDs hier eintragen:
+        const adminUids = ['adminuid1', 'adminuid2']; // <-- eigene Admin-UID(s) eintragen
+        function showIfAdmin() {
+          let uid = null;
+          if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+            uid = firebase.auth().currentUser.uid;
+          } else if (window.getAuth && getAuth().currentUser) {
+            uid = getAuth().currentUser.uid;
+          }
+          if (uid && adminUids.includes(uid)) {
+            btn && (btn.style.display = '');
+          } else {
+            btn && (btn.style.display = 'none');
+          }
+        }
+        // Direkt prüfen und bei Login-Änderung erneut prüfen
+        showIfAdmin();
+        if (window.firebase && firebase.auth) {
+          firebase.auth().onAuthStateChanged(showIfAdmin);
+        }
+      });
+      </script>
       <h3>⚽ Spieltag Tipps (Top 5 Ligen)</h3>
+      <!-- API Token Modal -->
+      <div id="apiTokenModal" class="modal" style="display:none;">
+        <div class="modal-content">
+          <span class="close" id="apiTokenModalClose">×</span>
+          <h2>API Token setzen</h2>
+          <p>Hier kannst du deinen <b>football-data.org</b> API Token eintragen oder ändern.</p>
+          <input id="apiTokenInput" type="text" style="width:100%;padding:8px;font-size:15px;" placeholder="API Token..." />
+          <button id="apiTokenSaveBtn" style="margin-top:12px;">Speichern</button>
+          <div id="apiTokenSavedMsg" style="margin-top:10px;color:#28a745;display:none;">Token gespeichert!</div>
+        </div>
+      </div>
+      <script>
+      // API Token Modal logic
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('setApiTokenBtn');
+        const modal = document.getElementById('apiTokenModal');
+        const close = document.getElementById('apiTokenModalClose');
+        const input = document.getElementById('apiTokenInput');
+        const save = document.getElementById('apiTokenSaveBtn');
+        const savedMsg = document.getElementById('apiTokenSavedMsg');
+        if (btn && modal && close && input && save) {
+          btn.onclick = () => {
+            input.value = localStorage.getItem('footballDataToken') || '';
+            savedMsg.style.display = 'none';
+            modal.style.display = 'flex';
+            input.focus();
+          };
+          close.onclick = () => { modal.style.display = 'none'; };
+          save.onclick = () => {
+            localStorage.setItem('footballDataToken', input.value.trim());
+            savedMsg.style.display = '';
+            setTimeout(() => { savedMsg.style.display = 'none'; modal.style.display = 'none'; window.loadMatchday && window.loadMatchday(); }, 900);
+          };
+        }
+        // Modal close on outside click
+        window.onclick = function(event) {
+          if (event.target === modal) modal.style.display = 'none';
+        };
+      });
+      </script>
       <p style="font-size:12px; opacity:0.8;">Tippe den nächsten Spieltag. Einsatz in Münzen. Richtiger Ergebnistipp: 3x Auszahlung. Richtige Tendenz (1X2): 2x. Falsch: Einsatz weg. Nach Spielstart gesperrt.</p>
       <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
         <label for="leagueSelect" style="font-weight:600;">Liga:</label>
@@ -17018,7 +17085,11 @@ document.addEventListener("keydown", (e) => {
   const listEl = () => document.getElementById('fixturesList');
   const selectEl = () => document.getElementById('leagueSelect');
   function setInfo(msg){ try{ if(infoEl()) infoEl().textContent = msg; }catch(e){} }
-  function getToken(){ return localStorage.getItem('footballDataToken') || ''; }
+  function getToken(){
+    const stored = localStorage.getItem('footballDataToken');
+    // Default to provided token if none stored
+    return (stored && stored.trim()) ? stored : '42525aa12c0d4f478c1627432b66b0d0';
+  }
   window.setFootballDataToken = function(token){ try{ localStorage.setItem('footballDataToken', token || ''); setInfo('Token gespeichert. Bitte Aktualisieren klicken.'); }catch(e){} };
   async function fetchLiveFixtures(leagueKey){
     const token = getToken();
