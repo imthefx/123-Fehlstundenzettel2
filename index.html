@@ -2164,20 +2164,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <div class="card">
       <h2>Registrieren</h2>
-      <input id="regEmail" type="email" placeholder="E-Mail">
-      <input id="regPass" type="password" placeholder="Passwort">
-      <input id="regNick" type="text" placeholder="Nickname (einzigartig)">
+      <input id="regEmail" type="email" placeholder="E-Mail" autocomplete="off">
+      <input id="regPass" type="password" placeholder="Passwort" autocomplete="new-password">
+      <input id="regNick" type="text" placeholder="Nickname (einzigartig)" autocomplete="off">
       <button onclick="register()">Konto erstellen</button>
     </div>
 
     <div class="card">
       <h2>Login</h2>
-      <input id="logEmail" type="email" placeholder="E-Mail">
-      <input id="logPass" type="password" placeholder="Passwort">
+      <input id="logEmail" type="email" placeholder="E-Mail" autocomplete="username">
+      <input id="logPass" type="password" placeholder="Passwort" autocomplete="current-password">
       <button onclick="login()">Login</button>
       <button onclick="logout()">Logout</button>
       <p id="userState"></p>
       <div id="loginError" style="color: #ff3333; margin-top: 10px; font-weight: 600; display: none;"></div>
+      <a href="#" onclick="resetPassword(); return false;" style="display: block; margin-top: 15px; text-align: center; color: #007bff; font-size: 14px; text-decoration: none;">Passwort vergessen?</a>
     </div>
   </div>
 </div>
@@ -5336,6 +5337,30 @@ window.login = async function() {
       errorDiv.textContent = message;
       errorDiv.style.display = 'block';
     }
+  }
+};
+
+// Passwort zurücksetzen
+window.resetPassword = async function() {
+  const email = document.getElementById("logEmail").value.trim();
+  
+  if (!email) {
+    showNotification("Hinweis", "Bitte gib deine E-Mail-Adresse ein, um das Passwort zurückzusetzen.");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showNotification("E-Mail gesendet", `Wir haben dir einen Link zum Zurücksetzen des Passworts an ${email} gesendet. Bitte prüfe dein Postfach (auch Spam).`);
+  } catch (err) {
+    console.error('Password reset error:', err);
+    let message = "Fehler beim Senden der E-Mail.";
+    if (err.code === 'auth/user-not-found') {
+      message = "Diese E-Mail-Adresse ist nicht registriert.";
+    } else if (err.code === 'auth/invalid-email') {
+      message = "Ungültige E-Mail-Adresse.";
+    }
+    showNotification("Fehler", message);
   }
 };
 
