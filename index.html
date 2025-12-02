@@ -16,6 +16,7 @@ body {
   background:#f2f4f8;
   color:#111;
   position: relative;
+  --name-default-color: #333333;
 }
 
 /* Rainbow Text Animation */
@@ -217,6 +218,11 @@ body.dark-mode .modal .close:hover {
   color: #fff;
 }
 
+/* Default name color adapts to dark mode */
+body.dark-mode {
+  --name-default-color: #f0f0f0;
+}
+
 /* Quest Completion Popup */
 .quest-popup {
   position: fixed;
@@ -285,6 +291,12 @@ body.dark-mode .quest-popup {
   font-size: 14px;
   margin-right: 10px;
   opacity: 0.8;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#navUserInfo:hover {
+  opacity: 1;
 }
 
 #navAuthLink {
@@ -1239,6 +1251,178 @@ body.frosty-night-theme .close:hover {
   text-shadow: 0 0 15px rgba(0, 212, 255, 1);
 }
 
+/* Frosty Night: private chat bubbles inside modals (friends chat) */
+body.frosty-night-theme .modal-content .message {
+  background: #eaf4ff; /* very light, slightly blue-tinted for contrast */
+  color: #0b2540;      /* deep navy for strong readability */
+}
+body.frosty-night-theme .modal-content .message .name {
+  color: #0b2540;
+}
+body.frosty-night-theme .modal-content .message .time,
+body.frosty-night-theme .modal-content .message .timestamp,
+body.frosty-night-theme .modal-content .message .meta {
+  color: #5b7a99; /* softer meta text on light bubble */
+}
+/* Force high contrast for incoming messages regardless of class names */
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) {
+  background: #ffffff;
+  color: #0b2540;
+}
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .name { color: #0b2540; }
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .time,
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .timestamp,
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .meta { color: #5b7a99; }
+/* Ensure all text inside incoming bubbles is dark and readable */
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) * {
+  color: #0b2540 !important;
+}
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .time,
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .timestamp,
+body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .meta {
+  color: #5b7a99 !important;
+}
+
+/* Neutral chat modal: no theme effects, high readability */
+.modal-content .chat-box {
+  background: #ffffff !important;
+  color: #111111 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+.modal-content .message {
+  background: #f2f3f5 !important;
+  color: #111111 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+.modal-content .message .name,
+.modal-content .message .timestamp,
+.modal-content .message .time,
+.modal-content .message .meta {
+  color: #111111 !important;
+  text-shadow: none !important;
+}
+/* Other user messages: force plain black text */
+.modal-content .message:not(.me):not(.outgoing),
+.modal-content .message:not(.me):not(.outgoing) * {
+  color: #000000 !important;
+}
+.modal-content .message:not(.me):not(.outgoing) {
+  background: #ffffff !important;
+}
+
+/* Private chat: force ALL message text to black */
+.modal-content .message,
+.modal-content .message * {
+  color: #000000 !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: none !important;
+}
+/* Outgoing bubble variant (common classes: .me, .outgoing) */
+body.frosty-night-theme .modal-content .message.me,
+body.frosty-night-theme .modal-content .message.outgoing {
+  background: #1e6bd7; /* bright blue */
+  color: #ffffff;
+}
+body.frosty-night-theme .modal-content .message.me .name,
+body.frosty-night-theme .modal-content .message.outgoing .name {
+  color: #ffffff;
+}
+body.frosty-night-theme .modal-content .message.me .time,
+body.frosty-night-theme .modal-content .message.me .timestamp,
+body.frosty-night-theme .modal-content .message.me .meta,
+body.frosty-night-theme .modal-content .message.outgoing .time,
+body.frosty-night-theme .modal-content .message.outgoing .timestamp,
+body.frosty-night-theme .modal-content .message.outgoing .meta {
+  color: #d6e8ff; /* readable meta on dark bubble */
+}
+
+/* Ranking tables: improve contrast in dark/frosty themes */
+body.frosty-night-theme .ranking-table,
+body.dark-mode .ranking-table,
+body.midnight-purple-theme .ranking-table,
+body.aurora-borealis-theme .ranking-table {
+  color: #e0f7ff;
+}
+body.frosty-night-theme .ranking-table tr,
+body.dark-mode .ranking-table tr,
+body.midnight-purple-theme .ranking-table tr,
+body.aurora-borealis-theme .ranking-table tr {
+  background: rgba(27, 43, 66, 0.7);
+}
+body.frosty-night-theme .ranking-table tr:nth-child(even),
+body.dark-mode .ranking-table tr:nth-child(even),
+body.midnight-purple-theme .ranking-table tr:nth-child(even),
+body.aurora-borealis-theme .ranking-table tr:nth-child(even) {
+  background: rgba(20, 32, 50, 0.7);
+}
+body.frosty-night-theme .ranking-table td,
+body.frosty-night-theme .ranking-table th,
+body.dark-mode .ranking-table td,
+body.dark-mode .ranking-table th,
+body.midnight-purple-theme .ranking-table td,
+body.midnight-purple-theme .ranking-table th,
+body.aurora-borealis-theme .ranking-table td,
+body.aurora-borealis-theme .ranking-table th {
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Universal Ranking Table: always black text on white background */
+.ranking-table,
+.ranking-table thead,
+.ranking-table tbody,
+.ranking-table tr,
+.ranking-table th,
+.ranking-table td {
+  background: #ffffff !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+.ranking-table tr:nth-child(even) {
+  background: #f5f7fa !important;
+}
+.ranking-table th {
+  border-bottom: 2px solid #e0e6ed !important;
+}
+.ranking-table td {
+  border-bottom: 1px solid #e0e6ed !important;
+}
+/* Disable name color effects inside ranking tables */
+.ranking-table [data-color-id],
+.ranking-table .santa-text,
+.ranking-table .holly-text,
+.ranking-table .icy-text,
+.ranking-table .gold-text,
+.ranking-table .ruby-text,
+.ranking-table .emerald-text,
+.ranking-table .diamond-text,
+.ranking-table .rainbow-text {
+  color: #000000 !important;
+  -webkit-text-fill-color: initial !important;
+  background: none !important;
+  animation: none !important;
+  text-shadow: none !important;
+}
+
+/* Private chat panel readability (requires #privateChatPanel container) */
+#privateChatPanel {
+  background: rgba(27, 43, 66, 0.85);
+  color: #e0f7ff;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+#privateChatPanel .message {
+  background: rgba(20, 32, 50, 0.85);
+  color: #e0f7ff;
+}
+#privateChatPanel input,
+#privateChatPanel textarea {
+  background: rgba(16, 24, 40, 0.9);
+  color: #e0f7ff;
+  border-color: rgba(255,255,255,0.2);
+}
+
 body.dark-mode nav a { color:#f2f4f8; }
 
 body.dark-mode input,
@@ -1530,27 +1714,90 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
 
 /* Auto-apply effects without JS based on data-color-id */
 .message .name[data-color-id="santa"],
-.color-preview .color-preview-label[data-color-id="santa"] {
+.color-preview .color-preview-label[data-color-id="santa"],
+#profileModalNickname[data-color-id="santa"],
+#navUserInfo [data-color-id="santa"] {
   color:#D32F2F;
   animation: santaPulseGlow 2.2s ease-in-out infinite;
   font-weight:600;
 }
 
 .message .name[data-color-id="holly"],
-.color-preview .color-preview-label[data-color-id="holly"] {
+.color-preview .color-preview-label[data-color-id="holly"],
+#profileModalNickname[data-color-id="holly"],
+#navUserInfo [data-color-id="holly"] {
   color:#1B5E20;
   animation: hollyPulseGlow 2.4s ease-in-out infinite;
   font-weight:600;
 }
 
 .message .name[data-color-id="icy"],
-.color-preview .color-preview-label[data-color-id="icy"] {
+.color-preview .color-preview-label[data-color-id="icy"],
+#profileModalNickname[data-color-id="icy"],
+#navUserInfo [data-color-id="icy"] {
   color: transparent;
   background: linear-gradient(90deg, #ffffff, #B3E5FC, #ffffff);
   -webkit-background-clip: text;
   background-clip: text;
   background-size:200% 100%;
   animation: icyShimmerFlow 3s linear infinite;
+  font-weight:600;
+}
+
+/* Gold shimmer */
+.message .name[data-color-id="gold"],
+.color-preview .color-preview-label[data-color-id="gold"],
+#profileModalNickname[data-color-id="gold"],
+#navUserInfo [data-color-id="gold"] {
+  color:#FFD700;
+  animation: gold-glow 2s ease-in-out infinite;
+  font-weight:600;
+}
+
+/* Ruby pulse */
+.message .name[data-color-id="ruby"],
+.color-preview .color-preview-label[data-color-id="ruby"],
+#profileModalNickname[data-color-id="ruby"],
+#navUserInfo [data-color-id="ruby"] {
+  color:#E0115F;
+  animation: ruby-pulse 2s ease-in-out infinite;
+  font-weight:600;
+}
+
+/* Emerald glow */
+.message .name[data-color-id="emerald"],
+.color-preview .color-preview-label[data-color-id="emerald"],
+#profileModalNickname[data-color-id="emerald"],
+#navUserInfo [data-color-id="emerald"] {
+  color:#50C878;
+  animation: emerald-glow 2s ease-in-out infinite;
+  font-weight:600;
+}
+
+/* Diamond shimmer */
+.message .name[data-color-id="diamond"],
+.color-preview .color-preview-label[data-color-id="diamond"],
+#profileModalNickname[data-color-id="diamond"],
+#navUserInfo [data-color-id="diamond"] {
+  color:#B9F2FF;
+  animation: diamond-shimmer 3s ease-in-out infinite;
+  font-weight:600;
+}
+
+/* Rainbow flow */
+.message .name[data-color-id="rainbow"],
+.color-preview .color-preview-label[data-color-id="rainbow"],
+#profileModalNickname[data-color-id="rainbow"],
+#navUserInfo [data-color-id="rainbow"] {
+  background: linear-gradient(90deg, 
+    #ff0000, #ff7f00, #ffff00, #00ff00,
+    #0000ff, #4b0082, #9400d3, #ff0000
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow-flow 3s linear infinite;
   font-weight:600;
 }
 
@@ -2199,11 +2446,31 @@ document.addEventListener('DOMContentLoaded', () => {
         <button onclick="document.getElementById('profilePicInput').click()" style="width:100%;">Profilbild ändern</button>
       </div>
       
-      <!-- Vorschau für neues Profilbild -->
+      <!-- Vorschau für neues Profilbild mit Editor -->
       <div id="profilePicPreview" style="display:none; margin-top:15px; padding:15px; background:#f0f0f0; border-radius:8px;">
-        <p style="margin:0 0 10px 0; font-weight:bold;">Vorschau:</p>
-        <img id="previewImage" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid #28a745;">
-        <div style="margin-top:10px; display:flex; gap:10px;">
+        <p style="margin:0 0 10px 0; font-weight:bold;">Bild zuschneiden:</p>
+        
+        <!-- Canvas Editor -->
+        <div style="position:relative; width:300px; height:300px; margin:0 auto; background:#000; border-radius:8px; overflow:hidden; cursor:move;" id="imageEditorContainer">
+          <canvas id="profileCanvas" width="300" height="300" style="display:block;"></canvas>
+        </div>
+        
+        <!-- Zoom & Pan Controls -->
+        <div style="margin:15px 0; display:flex; align-items:center; gap:10px; justify-content:center;">
+          <button onclick="zoomProfileImage(-0.1)" style="width:40px; padding:8px; background:#007bff; color:white; font-size:18px;">−</button>
+          <input type="range" id="zoomSlider" min="100" max="300" value="100" step="5" style="flex:1; max-width:200px;" oninput="setProfileZoom(this.value)">
+          <button onclick="zoomProfileImage(0.1)" style="width:40px; padding:8px; background:#007bff; color:white; font-size:18px;">+</button>
+        </div>
+        
+        <p style="font-size:12px; color:#666; margin:10px 0; text-align:center;">💡 Ziehe das Bild, um es zu verschieben</p>
+        
+        <!-- Preview Circle -->
+        <div style="text-align:center; margin:15px 0;">
+          <p style="margin:0 0 8px 0; font-weight:bold; font-size:14px;">Vorschau:</p>
+          <img id="previewImage" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid #28a745;">
+        </div>
+        
+        <div style="margin-top:15px; display:flex; gap:10px;">
           <button onclick="confirmProfilePic()" style="flex:1; background:#28a745; color:white;">✓ Bestätigen</button>
           <button onclick="cancelProfilePic()" style="flex:1; background:#dc3545; color:white;">✗ Verwerfen</button>
         </div>
@@ -3050,8 +3317,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     <!-- Chat Name Farben -->
     <div class="card">
-      <h3 data-i18n="shop_chat_colors_title">🎨 Chat Name Farben</h3>
-      <p style="font-size:12px; opacity:0.8;" data-i18n="shop_chat_colors_desc">Ändere die Farbe deines Namens im Chat!</p>
+      <h3 data-i18n="shop_chat_colors_title">🎨 Namen Farben</h3>
+      <p style="font-size:12px; opacity:0.8;" data-i18n="shop_chat_colors_desc">Ändere die Farbe deines Namens!</p>
       <div id="chatColorList"></div>
     </div>
 
@@ -3127,8 +3394,8 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="shop-grid" id="inventoryGrid">
     <!-- Chat Name Farben -->
     <div class="card inv-cat" data-cat="chatColors">
-      <h3 data-i18n="inv_chat_colors_title">🎨 Chat Name Farben</h3>
-      <p style="font-size:12px; opacity:0.8;" data-i18n="inv_chat_colors_desc">Deine gekauften Namensfarben</p>
+      <h3 data-i18n="inv_chat_colors_title">🎨 Namen Farben</h3>
+      <p style="font-size:12px; opacity:0.8;" data-i18n="inv_chat_colors_desc">Deine Namensfarben</p>
       <div id="inventoryChatColors"></div>
     </div>
 
@@ -3225,7 +3492,9 @@ import {
   deleteUser,
   updatePassword,
   EmailAuthProvider,
-  reauthenticateWithCredential
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore,
@@ -3292,8 +3561,8 @@ const translations = {
       chat_gif_url: 'GIF URL einfügen',
       chat_send: 'Absenden',
       shop_title: '🛍️ Shop',
-      shop_chat_colors_title: '🎨 Chat Name Farben',
-      shop_chat_colors_desc: 'Ändere die Farbe deines Namens im Chat!',
+      shop_chat_colors_title: '🎨 Namen Farben',
+      shop_chat_colors_desc: 'Ändere die Farbe deines Namens!',
       shop_themes_title: '🌈 Website Themes',
       shop_themes_desc: 'Ändere das Design deiner Website!',
       shop_badges_title: '🎖️ Badges',
@@ -3315,8 +3584,8 @@ const translations = {
       purchased: '✓ Gekauft',
       buy: 'Kaufen',
       inventory_title: '🎒 Inventar',
-      inv_chat_colors_title: '🎨 Chat Name Farben',
-      inv_chat_colors_desc: 'Deine gekauften Namensfarben',
+      inv_chat_colors_title: '🎨 Namen Farben',
+      inv_chat_colors_desc: 'Deine Namensfarben',
       inv_themes_title: '🌈 Website Themes',
       inv_themes_desc: 'Deine gekauften Themes',
       inv_badges_title: '🏅 Badges & Nametags',
@@ -5176,6 +5445,7 @@ async function checkDailyBonus() {
 // Ersetze die onAuthStateChanged Funktion - füge checkDailyBonus hinzu:
 window.logout = async function() {
   await signOut(auth);
+  location.reload();
 };
 
 window.deleteAccount = async function() {
@@ -6171,7 +6441,49 @@ window.openUserProfile = async function(uid) {
     
     // Profilbild und Nickname
     document.getElementById('profileModalPic').src = data.profilePic || getDefaultProfilePic();
-    document.getElementById('profileModalNickname').textContent = data.nickname || 'Unbekannt';
+    const nicknameEl = document.getElementById('profileModalNickname');
+    nicknameEl.textContent = data.nickname || 'Unbekannt';
+    
+    // Namen-Farbe anwenden
+    const userInv = data.inventory || {};
+    const nameColor = userInv.chatNameColor;
+    if (nameColor) {
+      const colorData = CHAT_COLORS.find(c => c.id === nameColor);
+      if (colorData) {
+        // Spezialeffekte (Santa, Holly, Icy) via data-color-id
+        if (nameColor === 'santa_red') {
+          nicknameEl.setAttribute('data-color-id', 'santa');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'holly_green') {
+          nicknameEl.setAttribute('data-color-id', 'holly');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'icy_blue') {
+          nicknameEl.setAttribute('data-color-id', 'icy');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'gold') {
+          nicknameEl.setAttribute('data-color-id', 'gold');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'ruby_red') {
+          nicknameEl.setAttribute('data-color-id', 'ruby');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'emerald') {
+          nicknameEl.setAttribute('data-color-id', 'emerald');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'diamond') {
+          nicknameEl.setAttribute('data-color-id', 'diamond');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'rainbow') {
+          nicknameEl.setAttribute('data-color-id', 'rainbow');
+          nicknameEl.style.color = '';
+        } else {
+          nicknameEl.removeAttribute('data-color-id');
+          nicknameEl.style.color = colorData.color;
+        }
+      }
+    } else {
+      nicknameEl.removeAttribute('data-color-id');
+      nicknameEl.style.color = '';
+    }
     
     // Badge anzeigen
     const userInventory = data.inventory || {};
@@ -6388,8 +6700,17 @@ window.updatePassword = async function() {
   }
 };
 
-// Temporäre Variable für Vorschau-Bild
+// Temporäre Variable für Vorschau-Bild + Editor State
 let pendingProfilePicBase64 = null;
+let profileEditorState = {
+  image: null,
+  scale: 1,
+  posX: 0,
+  posY: 0,
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0
+};
 
 window.previewProfilePic = function() {
   const file = document.getElementById('profilePicInput').files[0];
@@ -6402,44 +6723,152 @@ window.previewProfilePic = function() {
     return;
   }
   
-  // Convert to Base64 für Vorschau
+  // Load image into editor
   const reader = new FileReader();
   reader.onload = function(e) {
-    pendingProfilePicBase64 = e.target.result;
-    document.getElementById('previewImage').src = pendingProfilePicBase64;
-    document.getElementById('profilePicPreview').style.display = 'block';
+    const img = new Image();
+    img.onload = function() {
+      profileEditorState.image = img;
+      profileEditorState.scale = 1;
+      profileEditorState.posX = 0;
+      profileEditorState.posY = 0;
+      
+      const canvas = document.getElementById('profileCanvas');
+      const container = document.getElementById('imageEditorContainer');
+      
+      // Setup drag handlers
+      container.onmousedown = startDragProfileImage;
+      container.onmousemove = dragProfileImage;
+      container.onmouseup = endDragProfileImage;
+      container.onmouseleave = endDragProfileImage;
+      
+      // Touch support
+      container.ontouchstart = (e) => { e.preventDefault(); startDragProfileImage(e.touches[0]); };
+      container.ontouchmove = (e) => { e.preventDefault(); dragProfileImage(e.touches[0]); };
+      container.ontouchend = endDragProfileImage;
+      
+      document.getElementById('zoomSlider').value = 100;
+      document.getElementById('profilePicPreview').style.display = 'block';
+      
+      renderProfileCanvas();
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 };
 
+function renderProfileCanvas() {
+  const canvas = document.getElementById('profileCanvas');
+  const ctx = canvas.getContext('2d');
+  const img = profileEditorState.image;
+  if (!img) return;
+  
+  const scale = profileEditorState.scale;
+  const posX = profileEditorState.posX;
+  const posY = profileEditorState.posY;
+  
+  // Clear
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, 300, 300);
+  
+  // Calculate dimensions
+  const imgAspect = img.width / img.height;
+  let drawWidth = 300 * scale;
+  let drawHeight = 300 * scale;
+  
+  if (imgAspect > 1) {
+    drawHeight = drawWidth / imgAspect;
+  } else {
+    drawWidth = drawHeight * imgAspect;
+  }
+  
+  const x = 150 - (drawWidth / 2) + posX;
+  const y = 150 - (drawHeight / 2) + posY;
+  
+  ctx.drawImage(img, x, y, drawWidth, drawHeight);
+  
+  // Update preview circle
+  updateCircularPreview();
+}
+
+function updateCircularPreview() {
+  const canvas = document.getElementById('profileCanvas');
+  const previewImg = document.getElementById('previewImage');
+  previewImg.src = canvas.toDataURL('image/jpeg', 0.9);
+}
+
+function startDragProfileImage(e) {
+  profileEditorState.isDragging = true;
+  profileEditorState.dragStartX = e.clientX || e.pageX;
+  profileEditorState.dragStartY = e.clientY || e.pageY;
+}
+
+function dragProfileImage(e) {
+  if (!profileEditorState.isDragging) return;
+  const clientX = e.clientX || e.pageX;
+  const clientY = e.clientY || e.pageY;
+  
+  const dx = clientX - profileEditorState.dragStartX;
+  const dy = clientY - profileEditorState.dragStartY;
+  
+  profileEditorState.posX += dx;
+  profileEditorState.posY += dy;
+  
+  profileEditorState.dragStartX = clientX;
+  profileEditorState.dragStartY = clientY;
+  
+  renderProfileCanvas();
+}
+
+function endDragProfileImage() {
+  profileEditorState.isDragging = false;
+}
+
+window.zoomProfileImage = function(delta) {
+  profileEditorState.scale = Math.max(0.5, Math.min(3, profileEditorState.scale + delta));
+  document.getElementById('zoomSlider').value = Math.round(profileEditorState.scale * 100);
+  renderProfileCanvas();
+};
+
+window.setProfileZoom = function(value) {
+  profileEditorState.scale = value / 100;
+  renderProfileCanvas();
+};
+
 window.confirmProfilePic = async function() {
-  if (!pendingProfilePicBase64 || !currentUser) return;
+  if (!profileEditorState.image || !currentUser) return;
   
   try {
+    // Get final cropped image from canvas
+    const canvas = document.getElementById('profileCanvas');
+    const croppedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+    
     await updateDoc(doc(db, 'users', currentUser.uid), {
-      profilePic: pendingProfilePicBase64
+      profilePic: croppedBase64
     });
     
-    currentProfilePic = pendingProfilePicBase64;
+    currentProfilePic = croppedBase64;
     
     // Update Account Settings Modal
-    document.getElementById('accountProfilePic').src = pendingProfilePicBase64;
+    document.getElementById('accountProfilePic').src = croppedBase64;
     document.getElementById('profilePicPreview').style.display = 'none';
     document.getElementById('profilePicInput').value = '';
     
     // Update Navigation
     const navUserInfo = document.getElementById('navUserInfo');
     if (navUserInfo) {
-      navUserInfo.innerHTML = `<img src="${pendingProfilePicBase64}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> ${currentNickname}`;
+      navUserInfo.innerHTML = `<img src="${croppedBase64}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> ${currentNickname}`;
     }
     
     // Update Chat Info
     const chatInfo = document.getElementById('chatInfo');
     if (chatInfo) {
-      chatInfo.innerHTML = `<img src="${pendingProfilePicBase64}" style="width:20px; height:20px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> Du schreibst als: ${currentNickname}`;
+      chatInfo.innerHTML = `<img src="${croppedBase64}" style="width:20px; height:20px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> Du schreibst als: ${currentNickname}`;
     }
     
+    // Reset editor state
     pendingProfilePicBase64 = null;
+    profileEditorState = { image: null, scale: 1, posX: 0, posY: 0, isDragging: false, dragStartX: 0, dragStartY: 0 };
     
     showNotification('Erfolg', 'Profilbild aktualisiert! Ranglisten werden beim nächsten Laden aktualisiert.');
   } catch (err) {
@@ -6451,6 +6880,7 @@ window.cancelProfilePic = function() {
   document.getElementById('profilePicPreview').style.display = 'none';
   document.getElementById('profilePicInput').value = '';
   pendingProfilePicBase64 = null;
+  profileEditorState = { image: null, scale: 1, posX: 0, posY: 0, isDragging: false, dragStartX: 0, dragStartY: 0 };
 };
 
 onAuthStateChanged(auth, async user => {
@@ -6493,7 +6923,42 @@ onAuthStateChanged(auth, async user => {
     if (userState)
       userState.textContent = "Eingeloggt als: " + currentNickname + " (" + user.email + ")";
     if (chatInfo) {
-      chatInfo.innerHTML = `<img src="${currentProfilePic}" style="width:20px; height:20px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> Du schreibst als: ${currentNickname}`;
+      chatInfo.innerHTML = `<img src="${currentProfilePic}" style="width:20px; height:20px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> Du schreibst als: <span id="chatNicknameSpan">${currentNickname}</span>`;
+    }
+
+    // Nav user info with name color and open profile on click
+    if (navUserInfo) {
+      const invDoc = await getDoc(doc(db, 'users', user.uid));
+      const invData = invDoc.exists() ? invDoc.data() : {};
+      const nameColor = (invData.inventory || {}).chatNameColor;
+      const nameSpan = document.createElement('span');
+      nameSpan.id = 'navNicknameSpan';
+      nameSpan.textContent = currentNickname;
+      // Apply special effects via data-color-id or plain color
+      if (nameColor === 'santa_red') {
+        nameSpan.setAttribute('data-color-id', 'santa');
+      } else if (nameColor === 'holly_green') {
+        nameSpan.setAttribute('data-color-id', 'holly');
+      } else if (nameColor === 'icy_blue') {
+        nameSpan.setAttribute('data-color-id', 'icy');
+      } else if (nameColor === 'gold') {
+        nameSpan.setAttribute('data-color-id', 'gold');
+      } else if (nameColor === 'ruby_red') {
+        nameSpan.setAttribute('data-color-id', 'ruby');
+      } else if (nameColor === 'emerald') {
+        nameSpan.setAttribute('data-color-id', 'emerald');
+      } else if (nameColor === 'diamond') {
+        nameSpan.setAttribute('data-color-id', 'diamond');
+      } else if (nameColor === 'rainbow') {
+        nameSpan.setAttribute('data-color-id', 'rainbow');
+      } else if (nameColor) {
+        const colorData = CHAT_COLORS.find(c => c.id === nameColor);
+        if (colorData) nameSpan.style.color = colorData.color;
+      }
+
+      navUserInfo.innerHTML = `<img src="${currentProfilePic}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px;"> `;
+      navUserInfo.appendChild(nameSpan);
+      navUserInfo.onclick = () => openUserProfile(user.uid);
     }
 
     // News-Formular nur Admin
@@ -6664,18 +7129,33 @@ async function loadNews() {
       newsItems.push({ id: docu.id, ...docu.data() });
     });
 
-    // Profilbilder laden
+    // Profilbilder und Namenfarben laden
     const profilePics = {};
+    const nameColors = {};
+    const nicknames = {};
     for (const item of newsItems) {
       if (item.uid) {
         try {
           const userDoc = await getDoc(doc(db, 'users', item.uid));
-          profilePics[item.uid] = userDoc.exists() ? (userDoc.data().profilePic || getDefaultProfilePic()) : getDefaultProfilePic();
+          if (userDoc.exists()) {
+            const u = userDoc.data();
+            profilePics[item.uid] = u.profilePic || getDefaultProfilePic();
+            nameColors[item.uid] = (u.inventory || {}).chatNameColor || null;
+            nicknames[item.uid] = u.nickname || item.author;
+          } else {
+            profilePics[item.uid] = getDefaultProfilePic();
+            nameColors[item.uid] = null;
+            nicknames[item.uid] = item.author;
+          }
         } catch {
           profilePics[item.uid] = getDefaultProfilePic();
+          nameColors[item.uid] = null;
+          nicknames[item.uid] = item.author;
         }
       } else {
         profilePics[item.uid] = getDefaultProfilePic();
+        nameColors[item.uid] = null;
+        nicknames[item.uid] = item.author;
       }
     }
 
@@ -6683,9 +7163,22 @@ async function loadNews() {
     newsItems.forEach(d => {
       const date = d.createdAt?.toDate?.() || new Date();
       const profilePic = profilePics[d.uid];
+      const cId = nameColors[d.uid];
+      const nn = nicknames[d.uid] || d.author;
+      const coloredName = (() => {
+        if (cId === 'santa_red') return `<span data-color-id="santa">${nn}</span>`;
+        if (cId === 'holly_green') return `<span data-color-id="holly">${nn}</span>`;
+        if (cId === 'icy_blue') return `<span data-color-id="icy">${nn}</span>`;
+        if (cId) {
+          const c = CHAT_COLORS.find(x => x.id === cId);
+          if (c) return `<span style="color:${c.color}">${nn}</span>`;
+        }
+        return nn;
+      })();
       const authorDisplay = d.uid 
-        ? `<img src="${profilePic}" style="width:20px; height:20px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px; cursor:pointer;" onclick="openUserProfile('${d.uid}')"><span style="cursor:pointer;" onclick="openUserProfile('${d.uid}')">${d.author}</span>`
-        : d.author;
+        ? `<img src="${profilePic}" style="width:20px; height:20px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:5px; cursor:pointer;" onclick="openUserProfile('${d.uid}')">`+
+          `<span style="cursor:pointer;" onclick="openUserProfile('${d.uid}')">${coloredName}</span>`
+        : coloredName;
       
       html += `
         <div class="card">
@@ -6720,7 +7213,8 @@ window.postNews = async function() {
   await addDoc(collection(db, "news"), {
     title,
     content,
-    author: ADMIN_EMAIL,
+    // Setze Autor auf Nickname statt E-Mail
+    author: (await (async () => { try { const d = await getDoc(doc(db,'users', auth.currentUser.uid)); return d.exists() ? (d.data().nickname || ADMIN_EMAIL) : ADMIN_EMAIL; } catch { return ADMIN_EMAIL; } })()),
     uid: auth.currentUser.uid,
     createdAt: serverTimestamp()
   });
@@ -7065,6 +7559,22 @@ window.loadTTTRankings = async function() {
     }
     
     const isDark = document.body.classList.contains("dark-mode");
+    
+        // Load name colors for top10
+        const nameColors = {};
+        for (const p of top10) {
+          try {
+            const uDoc = await getDoc(doc(db, 'users', p.uid));
+            if (uDoc.exists()) {
+              const inv = (uDoc.data().inventory || {});
+              nameColors[p.uid] = inv.chatNameColor || null;
+            } else {
+              nameColors[p.uid] = null;
+            }
+          } catch {
+            nameColors[p.uid] = null;
+          }
+        }
     const headerBg = "#007bff";
     const headerText = "#fff";
     const rowBg1 = isDark ? "#333" : "#f9f9f9";
@@ -7074,7 +7584,7 @@ window.loadTTTRankings = async function() {
     
     const filterNames = { all: "Gesamt", noob: "Noob", profi: "Profi", champion: "Champion" };
     
-    let html = `<table style='width:100%; border-collapse:collapse; color:${textColor};'>`;
+    let html = `<table class='ranking-table' style='width:100%; border-collapse:collapse; color:${textColor};'>`;
     html += `<tr style='background:${headerBg}; color:${headerText};'><th style='padding:10px;'>#</th><th style='padding:10px;'>Spieler</th><th style='padding:10px;'>${filterNames[filter]} Siege</th>`;
     
     if (filter === "all") {
@@ -7091,7 +7601,22 @@ window.loadTTTRankings = async function() {
           <td style="padding:10px; text-align:center;">${medal} ${idx + 1}</td>
           <td style="padding:10px; cursor:pointer;" onclick="openUserProfile('${player.uid}')">
             <img src="${player.profilePic}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:8px;">
-            ${player.nickname}
+            ${(() => {
+              const cId = nameColors[player.uid];
+              if (cId === 'santa_red') return '<span data-color-id="santa">' + player.nickname + '</span>';
+              if (cId === 'holly_green') return '<span data-color-id="holly">' + player.nickname + '</span>';
+              if (cId === 'icy_blue') return '<span data-color-id="icy">' + player.nickname + '</span>';
+              if (cId === 'gold') return '<span data-color-id="gold">' + player.nickname + '</span>';
+              if (cId === 'ruby_red') return '<span data-color-id="ruby">' + player.nickname + '</span>';
+              if (cId === 'emerald') return '<span data-color-id="emerald">' + player.nickname + '</span>';
+              if (cId === 'diamond') return '<span data-color-id="diamond">' + player.nickname + '</span>';
+              if (cId === 'rainbow') return '<span data-color-id="rainbow">' + player.nickname + '</span>';
+              if (cId) {
+                const c = CHAT_COLORS.find(x => x.id === cId);
+                if (c) return '<span style="color:' + c.color + '">' + player.nickname + '</span>';
+              }
+              return player.nickname;
+            })()}
           </td>
           <td style="padding:10px; font-weight:bold;">${player.wins}</td>`;
       
@@ -8647,7 +9172,7 @@ async function loadTowerRankings(mode) {
     const textColor = isDark ? "#f2f4f8" : "#111";
     const borderColor = isDark ? "#555" : "#ddd";
     
-    let html = `<table style='width:100%; border-collapse:collapse; color:${textColor};'>`;
+    let html = `<table class='ranking-table' style='width:100%; border-collapse:collapse; color:${textColor};'>`;
     html += `<tr style='background:${headerBg}; color:${headerText};'><th style='padding:10px;'>#</th><th style='padding:10px;'>Spieler</th><th style='padding:10px;'>Score</th><th style='padding:10px;'>Datum</th></tr>`;
     
     top10.forEach((item, idx) => {
@@ -9825,6 +10350,107 @@ const MILLIONAIRE_QUESTIONS = [
     answers: ["Los Angeles", "Chicago", "New York", "Boston"],
     correct: 2
   }
+  ,
+  // Frage 201-300 (Neue Fragen – Gemischt)
+  { question: "Welche Farbe hat die Banane im reifen Zustand?", answers: ["Grün", "Gelb", "Rot", "Blau"], correct: 1 },
+  { question: "Wie viele Tage hat ein Schaltjahr?", answers: ["364", "365", "366", "367"], correct: 2 },
+  { question: "Welches ist das größte Land der Welt nach Fläche?", answers: ["USA", "China", "Kanada", "Russland"], correct: 3 },
+  { question: "Welche Sprache spricht man in Mexiko vorwiegend?", answers: ["Portugiesisch", "Spanisch", "Englisch", "Französisch"], correct: 1 },
+  { question: "Wie viele Kontinente gibt es offiziell?", answers: ["5", "6", "7", "8"], correct: 2 },
+  { question: "Wie heißt die Hauptstadt von Niederlanden?", answers: ["Amsterdam", "Rotterdam", "Den Haag", "Utrecht"], correct: 0 },
+  { question: "Welches Metall leitet Strom am besten?", answers: ["Gold", "Silber", "Kupfer", "Aluminium"], correct: 1 },
+  { question: "Wie viele Planeten hat unser Sonnensystem (seit 2006)?", answers: ["8", "9", "10", "7"], correct: 0 },
+  { question: "Welches Tier ist kein Primat?", answers: ["Gorilla", "Schimpanse", "Lemur", "Koala"], correct: 3 },
+  { question: "Woraus besteht Glas hauptsächlich?", answers: ["Sand", "Holz", "Ton", "Salz"], correct: 0 },
+  { question: "Welche Farbe hat die Ampel für 'Stop'?", answers: ["Rot", "Gelb", "Grün", "Blau"], correct: 0 },
+  { question: "Wie nennt man gefrorenes Wasser?", answers: ["Nebel", "Eis", "Tau", "Reif"], correct: 1 },
+  { question: "Welche Einheit misst Stromstärke?", answers: ["Volt", "Watt", "Ampere", "Ohm"], correct: 2 },
+  { question: "Welches Tier ist ein Raubfisch?", answers: ["Karpfen", "Hecht", "Forelle", "Wels"], correct: 1 },
+  { question: "Welche Stadt ist für das Oktoberfest bekannt?", answers: ["Berlin", "München", "Hamburg", "Köln"], correct: 1 },
+  { question: "Welche Zahl ist eine Primzahl?", answers: ["9", "15", "17", "21"], correct: 2 },
+  { question: "Welches Organ ist für das Sehen zuständig?", answers: ["Herz", "Leber", "Auge", "Niere"], correct: 2 },
+  { question: "Wie viele Minuten hat eine Stunde?", answers: ["30", "45", "60", "90"], correct: 2 },
+  { question: "Welches Getränk enthält am meisten Koffein?", answers: ["Kakao", "Cola", "Kaffee", "Tee"], correct: 2 },
+  { question: "Welche Stadt ist die Hauptstadt von Schweiz?", answers: ["Zürich", "Genf", "Bern", "Basel"], correct: 2 },
+  { question: "Welches Tier ist ein Säugetier?", answers: ["Hai", "Delfin", "Forelle", "Krabbe"], correct: 1 },
+  { question: "Welches Gerät misst Temperatur?", answers: ["Barometer", "Thermometer", "Hygrometer", "Anemometer"], correct: 1 },
+  { question: "Wie heißt der längste Tag im Jahr?", answers: ["Wintersonnenwende", "Sommersonnenwende", "Tagundnachtgleiche", "Neujahr"], correct: 1 },
+  { question: "Welche Farbe hat Kupfer oft als Patina?", answers: ["Schwarz", "Grün", "Weiß", "Rot"], correct: 1 },
+  { question: "Wie viele Spieler hat ein Volleyballteam auf dem Feld?", answers: ["5", "6", "7", "8"], correct: 1 },
+  { question: "Welches ist ein Webprotokoll?", answers: ["SMTP", "HTTP", "FTP", "SSH"], correct: 1 },
+  { question: "Welcher Planet ist als Morgenstern bekannt?", answers: ["Mars", "Venus", "Merkur", "Jupiter"], correct: 1 },
+  { question: "Wie heißt die Hauptstadt von Türkei?", answers: ["Istanbul", "Ankara", "Izmir", "Antalya"], correct: 1 },
+  { question: "Welche Form hat ein Stoppschild?", answers: ["Sechseck", "Achteck", "Dreieck", "Kreis"], correct: 1 },
+  { question: "Wie nennt man die Lehre vom Geld?", answers: ["Soziologie", "Numismatik", "Ökologie", "Logik"], correct: 1 },
+  { question: "Welches ist kein Betriebssystem?", answers: ["Windows", "Linux", "Android", "Photoshop"], correct: 3 },
+  { question: "Welches ist ein Gewürz?", answers: ["Basalt", "Paprika", "Quarz", "Granit"], correct: 1 },
+  { question: "Wie heißt der höchste Berg Europas (wenn Kaukasus zählt)?", answers: ["Mont Blanc", "Matterhorn", "Elbrus", "Grossglockner"], correct: 2 },
+  { question: "Welches ist ein Primärfarbton?", answers: ["Cyan", "Magenta", "Gelb", "Türkis"], correct: 2 },
+  { question: "Wie viele Bundesländer hat Österreich?", answers: ["7", "8", "9", "10"], correct: 2 },
+  { question: "Welches Tier ist ein Insekt?", answers: ["Spinne", "Biene", "Skorpion", "Hund"], correct: 1 },
+  { question: "Welcher Fluss fließt durch London?", answers: ["Seine", "Themse", "Elbe", "Donau"], correct: 1 },
+  { question: "Welche Einheit misst Energie?", answers: ["Newton", "Joule", "Pascal", "Lux"], correct: 1 },
+  { question: "Welches Tier ist ein Reptil?", answers: ["Frosch", "Salamander", "Eidechse", "Marienkäfer"], correct: 2 },
+  { question: "Wie nennt man eine Gedankenfabrik?", answers: ["Think-Tank", "Brain-Box", "Mind-Set", "Idea-Center"], correct: 0 },
+  { question: "Welches Land liegt NICHT in Skandinavien?", answers: ["Norwegen", "Dänemark", "Finnland", "Estland"], correct: 3 },
+  { question: "Welche Zahl ist römisch 'X'?", answers: ["5", "10", "50", "100"], correct: 1 },
+  { question: "Welches Getränk ist fermentiert?", answers: ["Milch", "Wasser", "Joghurt", "Saft"], correct: 2 },
+  { question: "Welches ist die kleinste Einheit der Schrift?", answers: ["Wort", "Satz", "Buchstabe", "Absatz"], correct: 2 },
+  { question: "Wie heißt die Hauptstadt von Marokko?", answers: ["Casablanca", "Rabat", "Fes", "Marrakesch"], correct: 1 },
+  { question: "Welche Programmiersprache läuft im Browser?", answers: ["Python", "JavaScript", "C#", "Go"], correct: 1 },
+  { question: "Welches ist ein Süßwassersee?", answers: ["Mittelmeer", "Kaspisches Meer", "Baikalsee", "Ostsee"], correct: 2 },
+  { question: "Wie heißt die Hauptstadt von Australien?", answers: ["Sydney", "Melbourne", "Canberra", "Perth"], correct: 2 },
+  { question: "Welches Tier hat einen Beutel?", answers: ["Känguru", "Koala", "Wombat", "Alle"], correct: 3 },
+  { question: "Welche Zahl ist binär 1010?", answers: ["8", "9", "10", "11"], correct: 2 },
+  { question: "Welches ist ein Textdateiformat?", answers: [".jpg", ".png", ".txt", ".mp3"], correct: 2 },
+  { question: "Wie viele Seiten hat ein Pentagon?", answers: ["4", "5", "6", "7"], correct: 1 },
+  { question: "Welches ist kein Kontinent?", answers: ["Australien", "Antarktis", "Arktis", "Afrika"], correct: 2 },
+  { question: "Welche Stadt liegt an der Donau?", answers: ["Paris", "Wien", "Madrid", "Lissabon"], correct: 1 },
+  { question: "Wie nennt man die Lehre von der Umwelt?", answers: ["Ökologie", "Etymologie", "Ethnologie", "Epidemiologie"], correct: 0 },
+  { question: "Welches ist ein typischer Programmiersprachen-Datentyp?", answers: ["Array", "Formel", "Textblock", "Schriftart"], correct: 0 },
+  { question: "Welche Säure findet man in Zitrusfrüchten?", answers: ["Milchsäure", "Essigsäure", "Zitronensäure", "Ameisensäure"], correct: 2 },
+  { question: "Wie heißt die Hauptstadt von Südafrika (eine davon)?", answers: ["Johannesburg", "Kapstadt", "Durban", "Pretoria"], correct: 3 },
+  { question: "Welches ist ein Cloud-Anbieter?", answers: ["Azure", "Node", "React", "Webpack"], correct: 0 },
+  { question: "Welche Zahl ist 3^4?", answers: ["27", "64", "81", "243"], correct: 1 },
+  { question: "Welche Musiknote ist höher?", answers: ["A", "C", "E", "G"], correct: 1 },
+  { question: "Welcher Sport verwendet ein Shuttlecock?", answers: ["Tennis", "Badminton", "Squash", "Padel"], correct: 1 },
+  { question: "Welche Programmiersprache stammt von Sun Microsystems?", answers: ["Java", "Python", "Rust", "Swift"], correct: 0 },
+  { question: "Wie heißt die Hauptstadt von Argentinien?", answers: ["Lima", "Buenos Aires", "Santiago", "Montevideo"], correct: 1 },
+  { question: "Welches ist ein Edelgas?", answers: ["Neon", "Stickstoff", "Sauerstoff", "Wasserstoff"], correct: 0 },
+  { question: "Welche Maßeinheit misst Leistung?", answers: ["Watt", "Volt", "Ampere", "Ohm"], correct: 0 },
+  { question: "Welches Land ist für Sushi bekannt?", answers: ["China", "Japan", "Korea", "Thailand"], correct: 1 },
+  { question: "Welcher Fluss ist der längste in Deutschland?", answers: ["Elbe", "Rhein", "Donau", "Weser"], correct: 1 },
+  { question: "Was ist HTML?", answers: ["Programmiersprache", "Auszeichnungssprache", "Datenbank", "Protokoll"], correct: 1 },
+  { question: "Welches Tier ist ein Weichtier?", answers: ["Krake", "Krabbe", "Lachs", "Qualle"], correct: 0 },
+  { question: "Welches Getränk entsteht durch Destillation?", answers: ["Wein", "Bier", "Whisky", "Most"], correct: 2 },
+  { question: "Wie viele Millimeter sind ein Zentimeter?", answers: ["1", "5", "10", "100"], correct: 2 },
+  { question: "Welches Vitamin ist wichtig für die Blutgerinnung?", answers: ["Vitamin A", "Vitamin K", "Vitamin B12", "Vitamin D"], correct: 1 },
+  { question: "Welches ist ein Schweizer Kanton?", answers: ["Tirol", "Graubünden", "Südtirol", "Vorarlberg"], correct: 1 },
+  { question: "Welche Zahl ist römisch 'L'?", answers: ["5", "50", "500", "100"], correct: 1 },
+  { question: "Welches Tier ist ein Nagetier?", answers: ["Hase", "Meerschweinchen", "Hamster", "Alle"], correct: 3 },
+  { question: "Welche Sprache spricht man in Brasilien?", answers: ["Spanisch", "Portugiesisch", "Französisch", "Englisch"], correct: 1 },
+  { question: "Welche Zahl ist 2^10?", answers: ["512", "1024", "2048", "4096"], correct: 1 },
+  { question: "Welches ist ein Pilz?", answers: ["Champignon", "Brokkoli", "Zucchini", "Paprika"], correct: 0 },
+  { question: "Wie viele Beine hat ein Tausendfüßler ungefähr?", answers: ["20-100", "100-200", "200-400", "400-1000"], correct: 0 },
+  { question: "Welches ist die Hauptstadt von Neuseeland?", answers: ["Auckland", "Wellington", "Christchurch", "Hamilton"], correct: 1 },
+  { question: "Welches ist ein Dateikompressionsformat?", answers: [".zip", ".docx", ".xlsx", ".pptx"], correct: 0 },
+  { question: "Welches Material ist magnetisch?", answers: ["Kupfer", "Aluminium", "Eisen", "Bronze"], correct: 2 },
+  { question: "Wie viele Bits hat eine IPv4-Adresse?", answers: ["16", "32", "64", "128"], correct: 1 },
+  { question: "Welches Land hat die Hauptstadt 'Reykjavik'?", answers: ["Finnland", "Island", "Norwegen", "Schweden"], correct: 1 },
+  { question: "Welches ist eine Monosaccharid?", answers: ["Glukose", "Saccharose", "Laktose", "Maltose"], correct: 0 },
+  { question: "Welche Farbe hat Silber?", answers: ["Silbern", "Grau", "Weiß", "Alle ähnlich"], correct: 3 },
+  { question: "Welches Land nutzt den Euro?", answers: ["Schweiz", "Norwegen", "Polen", "Portugal"], correct: 3 },
+  { question: "Welche Zahl ist die kleinste dreistellige Zahl?", answers: ["100", "101", "110", "111"], correct: 0 },
+  { question: "Welches ist ein Kontinent?", answers: ["Europa", "EU", "Eurozone", "Schengen"], correct: 0 },
+  { question: "Welche Einheit misst Frequenz?", answers: ["Hertz", "Joule", "Pascal", "Newton"], correct: 0 },
+  { question: "Welches Tier ist ein Amphib?", answers: ["Salamander", "Schildkröte", "Krokodil", "Eidechse"], correct: 0 },
+  { question: "Welche Stadt ist Hauptstadt von Kanada?", answers: ["Toronto", "Ottawa", "Montreal", "Vancouver"], correct: 1 },
+  { question: "Welche Internet-Domain steht für Deutschland?", answers: [".de", ".at", ".ch", ".dk"], correct: 0 },
+  { question: "Welches Gas verursacht Treibhauseffekt stark?", answers: ["Sauerstoff", "Stickstoff", "CO2", "Argon"], correct: 2 },
+  { question: "Welches ist ein Sternbild?", answers: ["Orion", "Titan", "Europa", "Ganymed"], correct: 0 },
+  { question: "Welche Sprache ist amtlich in Österreich?", answers: ["Deutsch", "Ungarisch", "Slowenisch", "Kroatisch"], correct: 0 },
+  { question: "Welches Gewürz ist aus getrockneten Beeren?", answers: ["Paprika", "Pfeffer", "Zimt", "Koriander"], correct: 1 },
+  { question: "Welche Zahl ist die Quadratwurzel aus 169?", answers: ["11", "12", "13", "14"], correct: 2 }
 ];
 
 const MILLIONAIRE_WINNINGS = [1, 2, 5, 10, 15, 25, 40, 60, 90, 130, 180, 250, 330, 420, 500];
@@ -10732,16 +11358,26 @@ async function loadPenaltyRankings(mode) {
     
     // Profilbilder laden
     const profilePics = {};
+    const nameColors = {};
     for (const score of top10) {
       if (score.uid) {
         try {
           const userDoc = await getDoc(doc(db, 'users', score.uid));
-          profilePics[score.uid] = userDoc.exists() ? (userDoc.data().profilePic || getDefaultProfilePic()) : getDefaultProfilePic();
+          if (userDoc.exists()) {
+            const uData = userDoc.data();
+            profilePics[score.uid] = uData.profilePic || getDefaultProfilePic();
+            nameColors[score.uid] = (uData.inventory || {}).chatNameColor || null;
+          } else {
+            profilePics[score.uid] = getDefaultProfilePic();
+            nameColors[score.uid] = null;
+          }
         } catch {
           profilePics[score.uid] = getDefaultProfilePic();
+          nameColors[score.uid] = null;
         }
       } else {
         profilePics[score.uid] = getDefaultProfilePic();
+        nameColors[score.uid] = null;
       }
     }
     
@@ -10767,7 +11403,22 @@ async function loadPenaltyRankings(mode) {
           <td style="padding:10px; text-align:center;">${medal} ${idx + 1}</td>
           <td style="padding:10px; cursor:pointer;" onclick="openUserProfile('${item.uid}')">
             <img src="${profilePic}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:8px;">
-            ${item.nickname}
+            ${(() => {
+              const cId = nameColors[item.uid];
+              if (cId === 'santa_red') return '<span data-color-id="santa">' + item.nickname + '</span>';
+              if (cId === 'holly_green') return '<span data-color-id="holly">' + item.nickname + '</span>';
+              if (cId === 'icy_blue') return '<span data-color-id="icy">' + item.nickname + '</span>';
+              if (cId === 'gold') return '<span data-color-id="gold">' + item.nickname + '</span>';
+              if (cId === 'ruby_red') return '<span data-color-id="ruby">' + item.nickname + '</span>';
+              if (cId === 'emerald') return '<span data-color-id="emerald">' + item.nickname + '</span>';
+              if (cId === 'diamond') return '<span data-color-id="diamond">' + item.nickname + '</span>';
+              if (cId === 'rainbow') return '<span data-color-id="rainbow">' + item.nickname + '</span>';
+              if (cId) {
+                const c = CHAT_COLORS.find(x => x.id === cId);
+                if (c) return '<span style=\"color:' + c.color + '\">' + item.nickname + '</span>';
+              }
+              return item.nickname;
+            })()}
           </td>
           <td style="padding:10px; font-weight:bold;">${item.goals}</td>
           <td style="padding:10px; font-size:11px;">${diffLabel}</td>
@@ -11359,6 +12010,7 @@ async function loadChessRankings() {
     for (const [index, entry] of top10.entries()) {
       const userDoc = await getDoc(doc(db, 'users', entry.uid));
       const profilePic = userDoc.exists() ? (userDoc.data().profilePic || getDefaultProfilePic()) : getDefaultProfilePic();
+      const nameColorId = userDoc.exists() ? ((userDoc.data().inventory || {}).chatNameColor || null) : null;
       
       const medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `${index + 1}.`));
       const item = document.createElement('div');
@@ -11366,7 +12018,22 @@ async function loadChessRankings() {
       item.innerHTML = `
         <img src="${profilePic}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; cursor:pointer;" onclick="openUserProfile('${entry.uid}')">
         <span style="font-weight:bold; min-width:30px;">${medal}</span>
-        <span style="flex:1; cursor:pointer; color:${nameColor}; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${entry.nickname || 'Unbekannt'}</span>
+        ${(() => {
+          const nn = entry.nickname || 'Unbekannt';
+          if (nameColorId === 'santa_red') return `<span data-color-id="santa" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'holly_green') return `<span data-color-id="holly" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'icy_blue') return `<span data-color-id="icy" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'gold') return `<span data-color-id="gold" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'ruby_red') return `<span data-color-id="ruby" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'emerald') return `<span data-color-id="emerald" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'diamond') return `<span data-color-id="diamond" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId === 'rainbow') return `<span data-color-id="rainbow" style="flex:1; cursor:pointer; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          if (nameColorId) {
+            const c = CHAT_COLORS.find(x => x.id === nameColorId);
+            if (c) return `<span style="flex:1; cursor:pointer; color:${c.color}; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+          }
+          return `<span style="flex:1; cursor:pointer; color:${nameColor}; font-weight:600;" onclick="openUserProfile('${entry.uid}')">${nn}</span>`;
+        })()}
         <span>${difficultyEmoji[entry.difficulty]} ${difficultyLabels[entry.difficulty]}</span>
         <span style="font-weight:bold; color:#f39c12;">🪙 ${entry.coins}</span>
       `;
@@ -11523,7 +12190,7 @@ const SNAKE_SKINS = [
 ];
 
 const CHAT_COLORS = [
-  { id: "default", name: "Standard", color: "#333333", price: 0 },
+  { id: "default", name: "Standard", color: "var(--name-default-color)", price: 0 },
   { id: "red", name: "Rot", color: "#FF0000", price: 100 },
   { id: "blue", name: "Blau", color: "#0099FF", price: 100 },
   { id: "green", name: "Grün", color: "#00AA00", price: 100 },
@@ -13940,16 +14607,26 @@ async function loadSnakeRankings(mode) {
     
     // Profilbilder laden
     const profilePics = {};
+    const nameColors = {};
     for (const score of top10) {
       if (score.uid) {
         try {
           const userDoc = await getDoc(doc(db, 'users', score.uid));
-          profilePics[score.uid] = userDoc.exists() ? (userDoc.data().profilePic || getDefaultProfilePic()) : getDefaultProfilePic();
+          if (userDoc.exists()) {
+            const uData = userDoc.data();
+            profilePics[score.uid] = uData.profilePic || getDefaultProfilePic();
+            nameColors[score.uid] = (uData.inventory || {}).chatNameColor || null;
+          } else {
+            profilePics[score.uid] = getDefaultProfilePic();
+            nameColors[score.uid] = null;
+          }
         } catch {
           profilePics[score.uid] = getDefaultProfilePic();
+          nameColors[score.uid] = null;
         }
       } else {
         profilePics[score.uid] = getDefaultProfilePic();
+        nameColors[score.uid] = null;
       }
     }
     
@@ -13974,7 +14651,22 @@ async function loadSnakeRankings(mode) {
           <td style="padding:10px; text-align:center;">${medal} ${idx + 1}</td>
           <td style="padding:10px; cursor:pointer;" onclick="openUserProfile('${item.uid}')">
             <img src="${profilePic}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:8px;">
-            ${item.nickname}
+            ${(() => {
+              const cId = nameColors[item.uid];
+              if (cId === 'santa_red') return '<span data-color-id="santa">' + item.nickname + '</span>';
+              if (cId === 'holly_green') return '<span data-color-id="holly">' + item.nickname + '</span>';
+              if (cId === 'icy_blue') return '<span data-color-id="icy">' + item.nickname + '</span>';
+              if (cId === 'gold') return '<span data-color-id="gold">' + item.nickname + '</span>';
+              if (cId === 'ruby_red') return '<span data-color-id="ruby">' + item.nickname + '</span>';
+              if (cId === 'emerald') return '<span data-color-id="emerald">' + item.nickname + '</span>';
+              if (cId === 'diamond') return '<span data-color-id="diamond">' + item.nickname + '</span>';
+              if (cId === 'rainbow') return '<span data-color-id="rainbow">' + item.nickname + '</span>';
+              if (cId) {
+                const c = CHAT_COLORS.find(x => x.id === cId);
+                if (c) return '<span style="color:' + c.color + '">' + item.nickname + '</span>';
+              }
+              return item.nickname;
+            })()}
           </td>
           <td style="padding:10px; font-weight:bold;">${item.score}</td>
           <td style="padding:10px; font-size:12px;">${item.date.toLocaleDateString("de-DE")}</td>
