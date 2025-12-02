@@ -2145,11 +2145,12 @@ import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, query, serve
 
 // Use global names to avoid redeclaration conflicts
 const __matchdayAuth = getAuth();
-const __matchdayDb = getFirestore();
+// Use existing app's Firestore if available to share session
+const __matchdayDb = (window.firebase && firebase.firestore) ? firebase.firestore() : getFirestore();
 
 // Helper: get current user
 function getCurrentUid() {
-  const u = __matchdayAuth.currentUser;
+  const u = __matchdayAuth && __matchdayAuth.currentUser ? __matchdayAuth.currentUser : (window.firebase && firebase.auth ? firebase.auth().currentUser : null);
   return u ? u.uid : null;
 }
 
