@@ -53,25 +53,86 @@ body {
   animation: gold-glow 2s ease-in-out infinite;
 }
 
-/* Ruby Red Exclusive - sanftes Pulsieren */
+/* Ruby Red Exclusive - enhanced crimson pulse with gem sparkle */
 @keyframes ruby-pulse {
-  0%, 100% { text-shadow: 0 0 8px rgba(224,17,95,0.4); }
-  50% { text-shadow: 0 0 12px rgba(224,17,95,0.8); }
+  0%, 100% {
+    text-shadow: 
+      0 0 5px rgba(224,17,95,0.8), 
+      0 0 10px rgba(224,17,95,0.5),
+      0 0 15px rgba(139,0,0,0.4),
+      2px 2px 3px rgba(255,0,100,0.3);
+    filter: brightness(1) saturate(1.3);
+  }
+  50% {
+    text-shadow: 
+      0 0 10px rgba(224,17,95,1), 
+      0 0 20px rgba(224,17,95,0.8),
+      0 0 30px rgba(139,0,0,0.6),
+      3px 3px 5px rgba(255,0,100,0.5),
+      -2px -2px 8px rgba(255,20,147,0.4);
+    filter: brightness(1.2) saturate(1.6);
+  }
 }
 .ruby-text { color: #E0115F; animation: ruby-pulse 2s ease-in-out infinite; }
 
-/* Emerald Exclusive */
+/* Emerald Exclusive - deep green glow with nature shimmer */
 @keyframes emerald-glow {
-  0%, 100% { text-shadow: 0 0 8px rgba(80,200,120,0.4); }
-  50% { text-shadow: 0 0 12px rgba(80,200,120,0.8); }
+  0%, 100% {
+    text-shadow: 
+      0 0 5px rgba(80,200,120,0.9), 
+      0 0 10px rgba(80,200,120,0.6),
+      0 0 15px rgba(34,139,34,0.4),
+      2px 2px 4px rgba(0,255,127,0.3);
+    filter: brightness(1.05) saturate(1.4);
+  }
+  50% {
+    text-shadow: 
+      0 0 10px rgba(80,200,120,1), 
+      0 0 20px rgba(80,200,120,0.8),
+      0 0 30px rgba(34,139,34,0.6),
+      3px 3px 6px rgba(0,255,127,0.5),
+      -2px -2px 8px rgba(144,238,144,0.4);
+    filter: brightness(1.15) saturate(1.7) hue-rotate(5deg);
+  }
 }
 .emerald-text { color: #50C878; animation: emerald-glow 2s ease-in-out infinite; }
 
-/* Diamond Exclusive */
+/* Diamond Exclusive - ice crystal shimmer with prismatic refraction */
 @keyframes diamond-shimmer {
-  0% { filter: brightness(1); }
-  50% { filter: brightness(1.2); }
-  100% { filter: brightness(1); }
+  0% {
+    text-shadow: 
+      0 0 5px rgba(185,242,255,0.9), 
+      0 0 10px rgba(185,242,255,0.6),
+      2px 2px 4px rgba(173,216,230,0.5),
+      -2px -2px 4px rgba(224,255,255,0.5);
+    filter: brightness(1.1) saturate(1.2);
+  }
+  33% {
+    text-shadow: 
+      0 0 8px rgba(185,242,255,1), 
+      0 0 16px rgba(185,242,255,0.8),
+      3px 3px 6px rgba(135,206,250,0.6),
+      -3px -3px 6px rgba(240,248,255,0.6),
+      0 0 20px rgba(176,224,230,0.4);
+    filter: brightness(1.25) saturate(1.5) hue-rotate(-10deg);
+  }
+  66% {
+    text-shadow: 
+      0 0 10px rgba(185,242,255,1), 
+      0 0 20px rgba(185,242,255,0.9),
+      4px 4px 8px rgba(70,130,180,0.7),
+      -4px -4px 8px rgba(255,250,250,0.7),
+      0 0 25px rgba(135,206,235,0.5);
+    filter: brightness(1.3) saturate(1.6) hue-rotate(10deg);
+  }
+  100% {
+    text-shadow: 
+      0 0 5px rgba(185,242,255,0.9), 
+      0 0 10px rgba(185,242,255,0.6),
+      2px 2px 4px rgba(173,216,230,0.5),
+      -2px -2px 4px rgba(224,255,255,0.5);
+    filter: brightness(1.1) saturate(1.2);
+  }
 }
 .diamond-text { color: #B9F2FF; animation: diamond-shimmer 3s ease-in-out infinite; }
 
@@ -1283,6 +1344,360 @@ body.frosty-night-theme .modal-content .message:not(.me):not(.outgoing) .meta {
   color: #5b7a99 !important;
 }
 
+/* ========================================================================= */
+/* ADVENT EXCLUSIVE THEMES                                                   */
+/* ========================================================================= */
+
+/* Kristallpalast (Crystal Palace) - Icy shimmer with frost patterns */
+@keyframes crystalShimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1.1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.15) saturate(1.3);
+  }
+}
+
+@keyframes frostPulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.3; }
+}
+
+body.advent-crystal-palace-theme {
+  background: linear-gradient(135deg, #e8f4f8, #d4e9f0, #c5e1e6, #b8dae3, #a8d8e0);
+  background-size: 400% 400%;
+  animation: crystalShimmer 12s ease-in-out infinite;
+  color: #0a3d52;
+}
+
+body.advent-crystal-palace-theme::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(185, 242, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(224, 255, 255, 0.2) 0%, transparent 60%);
+  animation: frostPulse 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.advent-crystal-palace-theme .card,
+body.advent-crystal-palace-theme .date-box,
+body.advent-crystal-palace-theme .chat-box {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(185, 242, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(173, 216, 230, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #0a3d52;
+}
+
+body.advent-crystal-palace-theme nav {
+  background: rgba(200, 230, 245, 0.9);
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid rgba(185, 242, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(173, 216, 230, 0.4);
+}
+
+body.advent-crystal-palace-theme h1,
+body.advent-crystal-palace-theme h2,
+body.advent-crystal-palace-theme h3 {
+  color: #0a3d52;
+  text-shadow: 0 0 10px rgba(185, 242, 255, 0.5), 0 2px 4px rgba(173, 216, 230, 0.3);
+}
+
+body.advent-crystal-palace-theme button {
+  background: linear-gradient(135deg, #b8dae3, #a8d8e0);
+  color: #0a3d52;
+  border: 2px solid rgba(185, 242, 255, 0.6);
+  box-shadow: 0 4px 15px rgba(173, 216, 230, 0.3);
+  font-weight: 600;
+}
+
+body.advent-crystal-palace-theme button:hover {
+  background: linear-gradient(135deg, #a8d8e0, #9ad0da);
+  box-shadow: 0 6px 25px rgba(173, 216, 230, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Nordlichter (Northern Lights) - Aurora waves animation */
+@keyframes auroraWave {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+  33% {
+    background-position: 100% 50%, 0% 50%, 75% 25%;
+  }
+  66% {
+    background-position: 50% 100%, 50% 0%, 25% 75%;
+  }
+  100% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+}
+
+@keyframes auroraPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes auroraShift {
+  0% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(20deg) brightness(1.15); }
+  100% { filter: hue-rotate(0deg) brightness(1); }
+}
+
+body.advent-northern-lights-theme {
+  background: 
+    linear-gradient(135deg, #1a237e 0%, #311b92 25%, #4a148c 50%, #1b5e20 75%, #004d40 100%),
+    radial-gradient(ellipse at top, rgba(0, 255, 136, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(139, 69, 255, 0.3) 0%, transparent 50%);
+  background-size: 400% 400%, 100% 100%, 100% 100%;
+  animation: auroraWave 15s ease-in-out infinite, auroraShift 10s ease-in-out infinite;
+  color: #e0f7ff;
+  position: relative;
+}
+
+body.advent-northern-lights-theme::before {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: 
+    radial-gradient(ellipse at 30% 20%, rgba(0, 255, 136, 0.4) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 80%, rgba(139, 69, 255, 0.4) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%);
+  animation: auroraPulse 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.advent-northern-lights-theme::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: 
+    linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(0, 255, 136, 0.1) 25%,
+      rgba(139, 69, 255, 0.1) 50%,
+      rgba(6, 182, 212, 0.1) 75%,
+      transparent 100%
+    );
+  background-size: 200% 100%;
+  animation: auroraWave 20s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.advent-northern-lights-theme .card,
+body.advent-northern-lights-theme .date-box,
+body.advent-northern-lights-theme .chat-box {
+  background: rgba(10, 20, 40, 0.85);
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 255, 136, 0.2),
+    0 0 20px rgba(139, 69, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #e0f7ff;
+  position: relative;
+  z-index: 1;
+}
+
+body.advent-northern-lights-theme nav {
+  background: rgba(10, 20, 40, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 2px solid rgba(0, 255, 136, 0.4);
+  box-shadow: 
+    0 4px 20px rgba(0, 255, 136, 0.3),
+    0 0 40px rgba(139, 69, 255, 0.2);
+  position: relative;
+  z-index: 10;
+}
+
+body.advent-northern-lights-theme nav a,
+body.advent-northern-lights-theme nav span,
+body.advent-northern-lights-theme nav button {
+  color: #e0f7ff;
+}
+
+body.advent-northern-lights-theme h1,
+body.advent-northern-lights-theme h2,
+body.advent-northern-lights-theme h3 {
+  color: #00ff88;
+  text-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.6),
+    0 0 40px rgba(0, 255, 136, 0.3),
+    0 2px 8px rgba(139, 69, 255, 0.2);
+}
+
+body.advent-northern-lights-theme input,
+body.advent-northern-lights-theme textarea {
+  background: rgba(10, 20, 40, 0.8);
+  color: #e0f7ff;
+  border: 2px solid rgba(0, 255, 136, 0.4);
+}
+
+body.advent-northern-lights-theme button {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(139, 69, 255, 0.2));
+  color: #e0f7ff;
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+  font-weight: 600;
+}
+
+body.advent-northern-lights-theme button:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(139, 69, 255, 0.3));
+  box-shadow: 
+    0 6px 25px rgba(0, 255, 136, 0.5),
+    0 0 30px rgba(139, 69, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+body.advent-northern-lights-theme .message {
+  background: rgba(10, 25, 45, 0.8);
+  border-left: 3px solid rgba(0, 255, 136, 0.5);
+}
+
+body.advent-northern-lights-theme .shop-item {
+  background: rgba(10, 20, 40, 0.8);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+}
+
+body.advent-northern-lights-theme p,
+body.advent-northern-lights-theme span,
+body.advent-northern-lights-theme label {
+  color: #e0f7ff;
+}
+
+/* Heilige Nacht (Holy Night) - Deep starry night with twinkling stars */
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes holyGlow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(30, 58, 95, 0.5),
+                inset 0 0 30px rgba(10, 25, 48, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(30, 58, 95, 0.8),
+                inset 0 0 50px rgba(10, 25, 48, 0.5);
+  }
+}
+
+body.advent-holy-night-theme {
+  background: 
+    radial-gradient(2px 2px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(1px 1px at 80% 10%, white, transparent),
+    radial-gradient(2px 2px at 90% 60%, white, transparent),
+    radial-gradient(1px 1px at 33% 80%, white, transparent),
+    radial-gradient(2px 2px at 15% 90%, white, transparent),
+    linear-gradient(135deg, #0a1930 0%, #1e3a5f 50%, #0d2540 100%);
+  background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+  background-position: 0% 0%, 40% 60%, 130% 270%, 70% 100%, 50% 120%, 230% 20%, 90% 180%, 0% 0%;
+  color: #d4e4f7;
+}
+
+body.advent-holy-night-theme::before {
+  content: '';
+  position: fixed;
+  top: 50%; left: 50%;
+  width: 150%; height: 150%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(30, 58, 95, 0.3) 0%, transparent 70%);
+  animation: holyGlow 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.advent-holy-night-theme .card,
+body.advent-holy-night-theme .date-box,
+body.advent-holy-night-theme .chat-box {
+  background: rgba(13, 27, 64, 0.9);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(30, 58, 95, 0.6);
+  box-shadow: 
+    0 8px 32px rgba(10, 25, 48, 0.5),
+    0 0 20px rgba(30, 58, 95, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #d4e4f7;
+  position: relative;
+  z-index: 1;
+}
+
+body.advent-holy-night-theme nav {
+  background: rgba(10, 25, 48, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid rgba(30, 58, 95, 0.7);
+  box-shadow: 0 4px 20px rgba(10, 25, 48, 0.6);
+  position: relative;
+  z-index: 10;
+}
+
+body.advent-holy-night-theme nav a,
+body.advent-holy-night-theme nav span,
+body.advent-holy-night-theme nav button {
+  color: #d4e4f7;
+}
+
+body.advent-holy-night-theme h1,
+body.advent-holy-night-theme h2,
+body.advent-holy-night-theme h3 {
+  color: #89b4d8;
+  text-shadow: 
+    0 0 10px rgba(30, 58, 95, 0.5),
+    0 2px 4px rgba(10, 25, 48, 0.3);
+}
+
+body.advent-holy-night-theme input,
+body.advent-holy-night-theme textarea {
+  background: rgba(10, 25, 48, 0.8);
+  color: #d4e4f7;
+  border: 2px solid rgba(30, 58, 95, 0.6);
+}
+
+body.advent-holy-night-theme button {
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.6), rgba(13, 37, 64, 0.6));
+  color: #d4e4f7;
+  border: 2px solid rgba(30, 58, 95, 0.8);
+  box-shadow: 0 4px 15px rgba(10, 25, 48, 0.4);
+  font-weight: 600;
+}
+
+body.advent-holy-night-theme button:hover {
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.8), rgba(13, 37, 64, 0.8));
+  box-shadow: 0 6px 25px rgba(30, 58, 95, 0.6);
+  transform: translateY(-2px);
+}
+
+body.advent-holy-night-theme .message {
+  background: rgba(13, 30, 55, 0.85);
+  border-left: 3px solid rgba(30, 58, 95, 0.7);
+}
+
+body.advent-holy-night-theme .shop-item {
+  background: rgba(13, 27, 64, 0.85);
+  border: 2px solid rgba(30, 58, 95, 0.5);
+  box-shadow: 0 4px 15px rgba(10, 25, 48, 0.4);
+}
+
+body.advent-holy-night-theme p,
+body.advent-holy-night-theme span,
+body.advent-holy-night-theme label {
+  color: #d4e4f7;
+}
+
 /* Neutral chat modal: no theme effects, high readability */
 .modal-content .chat-box {
   background: #ffffff !important;
@@ -1712,6 +2127,75 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
 }
 .icy-text { color: transparent; background: linear-gradient(90deg, #ffffff, #B3E5FC, #ffffff); -webkit-background-clip: text; background-clip: text; background-size:200% 100%; animation: icyShimmerFlow 3s linear infinite; font-weight:600; }
 
+@keyframes snowWhiteSnowfall {
+  0%, 100% {
+    text-shadow: 
+      0 0 3px rgba(240,248,255,0.5), 
+      0 0 6px rgba(240,248,255,0.3),
+      2px 2px 1px rgba(255,255,255,0.4),
+      -2px -2px 1px rgba(255,255,255,0.4),
+      3px -3px 2px rgba(255,255,255,0.3),
+      -3px 3px 2px rgba(255,255,255,0.3);
+  }
+  50% {
+    text-shadow: 
+      0 0 6px rgba(240,248,255,0.7), 
+      0 0 10px rgba(240,248,255,0.5),
+      -2px 3px 1px rgba(255,255,255,0.5),
+      2px -3px 1px rgba(255,255,255,0.5),
+      -3px 2px 2px rgba(255,255,255,0.4),
+      3px -2px 2px rgba(255,255,255,0.4);
+  }
+}
+
+@keyframes rudolfRedNose {
+  0%, 100% {
+    text-shadow: 
+      0 0 4px rgba(196,30,58,0.6), 
+      0 0 8px rgba(196,30,58,0.4),
+      0 0 12px rgba(255,0,0,0.3);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow: 
+      0 0 8px rgba(196,30,58,0.9), 
+      0 0 16px rgba(196,30,58,0.6),
+      0 0 24px rgba(255,0,0,0.5),
+      0 0 32px rgba(255,100,100,0.3);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes goldenStarSparkle {
+  0%, 100% {
+    text-shadow: 
+      0 0 5px rgba(255,215,0,0.8), 
+      0 0 10px rgba(255,165,0,0.6),
+      0 0 15px rgba(255,215,0,0.4),
+      2px 2px 3px rgba(255,223,0,0.5),
+      -2px -2px 3px rgba(255,223,0,0.5);
+    filter: brightness(1.1) saturate(1.2);
+  }
+  50% {
+    text-shadow: 
+      0 0 10px rgba(255,215,0,1), 
+      0 0 20px rgba(255,165,0,0.8),
+      0 0 30px rgba(255,215,0,0.6),
+      3px 3px 5px rgba(255,255,0,0.7),
+      -3px -3px 5px rgba(255,255,0,0.7);
+    filter: brightness(1.3) saturate(1.5);
+  }
+}
+
+@keyframes christmasMagicFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
 /* Auto-apply effects without JS based on data-color-id */
 .message .name[data-color-id="santa"],
 .color-preview .color-preview-label[data-color-id="santa"],
@@ -1760,8 +2244,8 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
 #profileModalNickname[data-color-id="ruby"],
 #navUserInfo [data-color-id="ruby"] {
   color:#E0115F;
-  animation: ruby-pulse 2s ease-in-out infinite;
-  font-weight:600;
+  animation: ruby-pulse 2.5s ease-in-out infinite;
+  font-weight:700;
 }
 
 /* Emerald glow */
@@ -1770,8 +2254,8 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
 #profileModalNickname[data-color-id="emerald"],
 #navUserInfo [data-color-id="emerald"] {
   color:#50C878;
-  animation: emerald-glow 2s ease-in-out infinite;
-  font-weight:600;
+  animation: emerald-glow 2.8s ease-in-out infinite;
+  font-weight:700;
 }
 
 /* Diamond shimmer */
@@ -1780,8 +2264,8 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
 #profileModalNickname[data-color-id="diamond"],
 #navUserInfo [data-color-id="diamond"] {
   color:#B9F2FF;
-  animation: diamond-shimmer 3s ease-in-out infinite;
-  font-weight:600;
+  animation: diamond-shimmer 3.5s ease-in-out infinite;
+  font-weight:700;
 }
 
 /* Rainbow flow */
@@ -1798,7 +2282,73 @@ body.dark-mode .chat-box { background:#222; color:#f2f4f8; }
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: rainbow-flow 3s linear infinite;
+}
+
+/* Schneeweiß (Advent Snow White) - static snowflakes decoration */
+.message .name[data-color-id="advent_snow"],
+.color-preview .color-preview-label[data-color-id="advent_snow"],
+#profileModalNickname[data-color-id="advent_snow"],
+#navUserInfo [data-color-id="advent_snow"] {
+  color:#F0F8FF;
   font-weight:600;
+}
+
+.message .name[data-color-id="advent_snow"]::before,
+#profileModalNickname[data-color-id="advent_snow"]::before,
+#navUserInfo [data-color-id="advent_snow"]::before {
+  content: '❄️ ';
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.message .name[data-color-id="advent_snow"]::after,
+#profileModalNickname[data-color-id="advent_snow"]::after,
+#navUserInfo [data-color-id="advent_snow"]::after {
+  content: ' ❄️';
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+/* Weihnachtsrot (Advent Christmas Red) - Rudolf red nose effect */
+.message .name[data-color-id="advent_xmas"],
+.color-preview .color-preview-label[data-color-id="advent_xmas"],
+#profileModalNickname[data-color-id="advent_xmas"],
+#navUserInfo [data-color-id="advent_xmas"] {
+  color:#C41E3A;
+  animation: rudolfRedNose 1.8s ease-in-out infinite;
+  font-weight:700;
+}
+
+/* Goldener Stern (Advent Golden Star) - sparkle effect */
+.message .name[data-color-id="advent_gold_star"],
+.color-preview .color-preview-label[data-color-id="advent_gold_star"],
+#profileModalNickname[data-color-id="advent_gold_star"],
+#navUserInfo [data-color-id="advent_gold_star"] {
+  color: transparent;
+  background: linear-gradient(90deg, #FFD700, #FFA500, #FFED4E, #FFA500, #FFD700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: goldenStarSparkle 2s ease-in-out infinite;
+  font-weight: 700;
+}
+
+/* Weihnachtszauber (Advent Christmas Magic) - festive rainbow flow */
+.message .name[data-color-id="advent_magic"],
+.color-preview .color-preview-label[data-color-id="advent_magic"],
+#profileModalNickname[data-color-id="advent_magic"],
+#navUserInfo [data-color-id="advent_magic"] {
+  background: linear-gradient(
+    90deg, 
+    #ff0000, #00ff00, #ffffff, #FFD700,
+    #ff0000, #00ff00, #ffffff, #FFD700
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: christmasMagicFlow 3s linear infinite;
+  font-weight: 700;
 }
 
 /* Advent Calendar Styles */
@@ -2096,25 +2646,26 @@ window.addEventListener('resize', fillNumberLayers);
       }
       fixturesList.innerHTML = '';
       infoEl.textContent = dataset.matchday;
+      // Map live fixtures for global lookup by placeBet
+      try {
+        window.__liveFixtures = window.__liveFixtures || {};
+        window.__liveFixtures[leagueKey] = {};
+      } catch(_) {}
       var now = Date.now();
       dataset.fixtures.forEach(function(fx){
         var locked = fx.kickoff <= now;
+        try { if (window.__liveFixtures) { window.__liveFixtures[leagueKey][String(fx.id)] = { id: fx.id, home: fx.home, away: fx.away, kickoff: fx.kickoff }; } } catch(_) {}
         var row = document.createElement('div');
         row.className = 'fixture-row';
         row.innerHTML =
           '<div><strong>' + fx.home + '</strong> vs <strong>' + fx.away + '</strong></div>' +
           '<div>Kickoff: ' + new Date(fx.kickoff).toLocaleString() + '</div>' +
           '<div>' +
-            'Einsatz: <input type="number" id="stake_' + fx.id + '" min="1" max="100" value="5" ' + (locked? 'disabled':'') + ' />' +
-            ' Tendenz: <select id="tendency_' + fx.id + '" ' + (locked? 'disabled':'') + '>' +
-              '<option value="H">Heimsieg</option>' +
-              '<option value="D">Remis</option>' +
-              '<option value="A">Auswärtssieg</option>' +
-            '</select>' +
+            'Einsatz: <input type="number" id="stake_' + fx.id + '" min="5" max="100" value="5" ' + (locked? 'disabled':'') + ' />' +
             ' Ergebnis: ' +
               '<input type="number" id="home_' + fx.id + '" min="0" value="0" style="width:50px" ' + (locked? 'disabled':'') + ' /> :' +
               '<input type="number" id="away_' + fx.id + '" min="0" value="0" style="width:50px" ' + (locked? 'disabled':'') + ' />' +
-            ' <button ' + (locked? 'disabled':'') + ' id="betbtn_' + fx.id + '">Wetten</button>' +
+            ' <button ' + (locked? 'disabled':'') + ' id="betbtn_' + fx.id + '" onclick="window.placeBet && window.placeBet(\'' + leagueKey + '\',\'' + fx.id + '\')">Wetten</button>' +
             (locked? '<span style="color:#b00;margin-left:8px;">Gesperrt nach Spielstart</span>':'' ) +
           '</div>';
         fixturesList.appendChild(row);
@@ -2132,6 +2683,26 @@ window.addEventListener('resize', fillNumberLayers);
       leagueSelect.addEventListener('change', renderLiveOrFallback);
     }
     if (refreshBtn) refreshBtn.addEventListener('click', renderLiveOrFallback);
+    // Extra delegated listener here as well (in case module script isn't ready yet)
+    try {
+      var container = document.getElementById('fixturesList');
+      if (container && !container.getAttribute('data-live-delegate')) {
+        container.addEventListener('click', function(e){
+          var btn = e.target && e.target.closest && e.target.closest('button');
+          if (!btn) return;
+          var id = null;
+          if (btn.id && btn.id.indexOf('betbtn_') === 0) id = btn.id.substring('betbtn_'.length);
+          if (!id && btn.id && btn.id.indexOf('bet-btn-') === 0) id = btn.id.substring('bet-btn-'.length);
+          if (!id) return;
+          var leagueKey = (leagueSelect && leagueSelect.value) ? leagueSelect.value : 'EPL';
+          console.debug('[live-delegate] click', leagueKey, id);
+          if (window.placeBet) {
+            try { window.placeBet(leagueKey, id); } catch(err){ console.error('placeBet error', err); }
+          }
+        }, true);
+        container.setAttribute('data-live-delegate','1');
+      }
+    } catch(_) {}
     // Always attempt live, then fallback via internal logic
     renderLiveOrFallback();
   });
@@ -2141,16 +2712,25 @@ window.addEventListener('resize', fillNumberLayers);
 <script type="module">
 // Minimal Firebase imports to work independently of existing module
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, query, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, query, where, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Use global names to avoid redeclaration conflicts
-const __matchdayAuth = getAuth();
-// Use existing app's Firestore if available to share session
-const __matchdayDb = (window.firebase && firebase.firestore) ? firebase.firestore() : getFirestore();
+// Use auth/db lazily to avoid race with main Firebase init
+let __matchdayAuth = null;
+try { __matchdayAuth = getAuth(); } catch(e) { /* initialized later; fall back to window.auth in getter */ }
+let __matchdayDb = null;
+function __getDb(){
+  if (__matchdayDb) return __matchdayDb;
+  // Prefer main app's db if already created
+  if (window.db) { __matchdayDb = window.db; return __matchdayDb; }
+  try { __matchdayDb = getFirestore(); } catch(e) { /* will retry on first use */ }
+  return __matchdayDb;
+}
 
 // Helper: get current user
 function getCurrentUid() {
-  const u = __matchdayAuth && __matchdayAuth.currentUser ? __matchdayAuth.currentUser : (window.firebase && firebase.auth ? firebase.auth().currentUser : null);
+  const u = (window.auth && window.auth.currentUser)
+    || (__matchdayAuth && __matchdayAuth.currentUser)
+    || (window.firebase && firebase.auth ? firebase.auth().currentUser : null);
   return u ? u.uid : null;
 }
 
@@ -2158,7 +2738,7 @@ function getCurrentUid() {
 async function addCoinsSimple(amount) {
   const uid = getCurrentUid();
   if (!uid) throw new Error('no-user');
-  const userRef = doc(__matchdayDb, 'users', uid);
+  const userRef = doc(__getDb(), 'users', uid);
   await updateDoc(userRef, { coins: increment(amount) });
 }
 
@@ -2190,9 +2770,9 @@ async function loadMatchday() {
   
   // Load existing bets for this user and league
   let userBets = {};
-  if (uid && window.__matchdayDb) {
+  if (uid) {
     try {
-      const betsCol = collection(__matchdayDb, 'footballBets', uid, 'bets');
+      const betsCol = collection(__getDb(), 'footballBets', uid, 'bets');
       const q = query(betsCol, where('league', '==', league));
       const snap = await getDocs(q);
       snap.forEach(doc => {
@@ -2220,61 +2800,215 @@ async function loadMatchday() {
   fixtures.forEach(m => {
     const d = new Date(m.kickoff);
     const locked = Date.now() >= m.kickoff;
+    const existingBet = userBets[m.id];
+    const betPlaced = !!existingBet;
+    const timeStr = d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }) + ' • ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    
+    // Determine status badge
+    let statusBadge = '';
+    if (locked) {
+      statusBadge = '<span style="color:#e74c3c; font-size:11px; font-weight:600; background:#e74c3c20; padding:4px 8px; border-radius:4px;">🔒 GESPERRT</span>';
+    } else if (betPlaced) {
+      statusBadge = '<span style="color:#ffa500; font-size:11px; font-weight:600; background:#ffa50020; padding:4px 8px; border-radius:4px;">✅ GETIPPT</span>';
+    } else {
+      statusBadge = '<span style="color:#28a745; font-size:11px; font-weight:600; background:#28a74520; padding:4px 8px; border-radius:4px;">✓ OFFEN</span>';
+    }
+    
+    const inputsDisabled = locked || betPlaced;
+    const stakeValue = betPlaced ? existingBet.stake : '';
+    const scoreValue = betPlaced ? existingBet.scorePred : '';
+    
+    // Determine tendency from score
+    let tendencyText = '';
+    if (betPlaced && existingBet.scorePred) {
+      const parts = existingBet.scorePred.split(':');
+      if (parts.length === 2) {
+        const h = parseInt(parts[0]);
+        const a = parseInt(parts[1]);
+        if (!isNaN(h) && !isNaN(a)) {
+          if (h > a) tendencyText = '🏠 Heimsieg';
+          else if (h < a) tendencyText = '✈️ Auswärtssieg';
+          else tendencyText = '🤝 Unentschieden';
+        }
+      }
+    }
+    
     html += `
-      <div style="border:1px solid #ddd; border-radius:8px; padding:12px; background:#fafafa;">
-        <div style="font-weight:600; margin-bottom:8px;">${m.home} vs. ${m.away}</div>
-        <div style="font-size:12px; opacity:0.7; margin-bottom:8px;">Kickoff: ${d.toLocaleString()}</div>
-        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <input type="number" min="1" max="${userCoins}" placeholder="Einsatz 🪙" id="stake-${m.id}" style="width:60px; padding:6px;" ${locked ? 'disabled' : ''} />
-          <select id="tendency-${m.id}" style="padding:6px; width:140px;" ${locked ? 'disabled' : ''}>
-            <option value="">Tendenz (1X2)</option>
-            <option value="1">Heimsieg</option>
-            <option value="X">Unentschieden</option>
-            <option value="2">Auswärtssieg</option>
-          </select>
-          <input type="text" placeholder="Ergebnis z.B. 2:1" id="score-${m.id}" style="width:120px; padding:6px;" ${locked ? 'disabled' : ''} />
-          <button onclick="placeBet('${league}','${m.id}')" ${locked ? 'disabled' : ''} style="padding:6px 16px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">Wetten</button>
+      <div id="match-card-${m.id}" style="border:1px solid ${locked ? '#555' : (betPlaced ? '#ffa500' : '#444')}; border-radius:10px; padding:16px; background:${locked ? '#2a2a3e' : (betPlaced ? '#3a3a2e' : '#252538')}; transition:all 0.2s;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-weight:600; font-size:15px; color:#fff;">${m.home} <span style="opacity:0.5;">vs</span> ${m.away}</div>
+          ${statusBadge}
         </div>
-        ${locked ? '<div style="margin-top:8px; color:#e74c3c; font-size:12px;">Wetten gesperrt (Spiel läuft/gestartet)</div>' : ''}
+        <div style="font-size:12px; opacity:0.6; margin-bottom:12px;">⏰ ${timeStr}</div>
+        <div id="bet-confirm-${m.id}" style="font-size:13px; margin-bottom:8px; font-weight:600; color:#28a745; ${betPlaced ? '' : 'display:none;'}">✅ Wette eingereicht</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="number" min="5" max="${userCoins}" placeholder="🪙" value="${stakeValue}" id="stake-${m.id}" style="width:40px; padding:8px; background:#1a1a2e; border:1px solid #444; border-radius:6px; color:#fff; text-align:center; font-weight:600; font-size:14px;" ${inputsDisabled ? 'disabled' : ''} />
+          <input type="text" placeholder="Tipp (z.B. 2:1)" value="${scoreValue}" id="score-${m.id}" style="flex:1; padding:10px; background:#1a1a2e; border:1px solid #444; border-radius:6px; color:#fff; text-align:center; font-size:14px;" ${inputsDisabled ? 'disabled' : ''} />
+        </div>
+        <button type="button" id="bet-btn-${m.id}" onclick="window.placeBet('${league}','${m.id}')" ${inputsDisabled ? 'disabled' : ''} style="width:100%; margin-top:12px; padding:12px; background:${inputsDisabled ? '#555' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; color:#fff; border:none; border-radius:8px; cursor:${inputsDisabled ? 'not-allowed' : 'pointer'}; font-weight:600; font-size:14px; transition:all 0.2s; box-shadow:${inputsDisabled ? 'none' : '0 4px 12px rgba(102,126,234,0.4)'};">${betPlaced ? '✅ Wette eingereicht' : (locked ? '🔒 Wetten gesperrt' : '💰 Wette platzieren')}</button>
       </div>
     `;
   });
   list.innerHTML = html;
+
+  // Ensure click handlers are bound even if inline onclick is ignored
+  try {
+    fixtures.forEach(m => {
+      const btn = document.getElementById(`bet-btn-${m.id}`);
+      if (btn && !btn.hasAttribute('data-bound')) {
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (window.placeBet) {
+            window.placeBet(league, m.id);
+          } else {
+            console.warn('placeBet not available on window');
+          }
+        });
+        btn.setAttribute('data-bound','1');
+      }
+    });
+  } catch(e) { console.error('bind bet buttons failed', e); }
+
+  // Fallback: event delegation on the list container (supports both id styles)
+  try {
+    const container = document.getElementById('fixturesList');
+    if (container && !container.getAttribute('data-delegate')) {
+      container.addEventListener('click', (e) => {
+        // New renderer buttons: bet-btn-<id>
+        let btn = e.target && e.target.closest && e.target.closest('button[id^="bet-btn-"]');
+        if (!btn) {
+          // Legacy/live wrapper buttons: betbtn_<id>
+          btn = e.target && e.target.closest && e.target.closest('button[id^="betbtn_"]');
+        }
+        if (btn && !btn.disabled) {
+          const id = btn.id.startsWith('bet-btn-') ? btn.id.replace('bet-btn-','') : btn.id.replace('betbtn_','');
+          if (window.placeBet) {
+            console.debug('Delegated click → placeBet', league, id);
+            window.placeBet(league, id);
+          } else {
+            console.warn('placeBet not on window at click time');
+          }
+        }
+      });
+      container.setAttribute('data-delegate','1');
+    }
+  } catch(e) { console.error('delegate bind failed', e); }
 }
 
 // Persistiere Wetten unter footballBets/{uid}/bets
       <!-- Matchday Live Fixtures Enhancer removed for compatibility; will re-add after testing -->
 
 async function placeBet(league, matchId) {
+  console.log('placeBet called:', league, matchId);
   const feedbackEl = document.getElementById('betFeedback');
   const uid = getCurrentUid();
-  if (!uid) { if (feedbackEl) feedbackEl.textContent = 'Bitte einloggen.'; return; }
+  const safeNotify = (title, msg) => { try { if (window.showNotification) window.showNotification(title, msg); } catch(_) {} };
+  
+  if (!uid) { 
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Bitte einloggen.</span>'; 
+    safeNotify('Fehler', 'Bitte melde dich an.');
+    return; 
+  }
+  
   const fixtures = MATCHDAY_FIXTURES[league] || [];
-  const match = fixtures.find(f => f.id === matchId);
-  if (!match) return;
-  if (Date.now() >= match.kickoff) { if (feedbackEl) feedbackEl.textContent = 'Wetten gesperrt.'; return; }
+  let match = fixtures.find(f => f.id === matchId);
+  if (!match) {
+    const liveMap = (window.__liveFixtures && window.__liveFixtures[league]) ? window.__liveFixtures[league] : null;
+    if (liveMap) {
+      match = liveMap[String(matchId)] || liveMap[matchId];
+    }
+  }
+  
+  if (!match) {
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Spiel nicht gefunden.</span>';
+    return;
+  }
+  
+  if (Date.now() >= match.kickoff) { 
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">🔒 Wetten gesperrt.</span>'; 
+    safeNotify('Fehler', 'Wetten nach Anpfiff gesperrt.');
+    return; 
+  }
 
-  const stakeEl = document.getElementById(`stake-${matchId}`);
-  const tendEl = document.getElementById(`tendency-${matchId}`);
-  const scoreEl = document.getElementById(`score-${matchId}`);
-  const stake = parseInt(stakeEl?.value || '0', 10);
-  const tendency = (tendEl?.value || '').trim();
-  const scorePred = (scoreEl?.value || '').trim();
+  // Support both renderers: new (stake-<id>, score-<id>) and legacy/live (stake_<id>, home_<id> + away_<id>)
+  let stakeEl = document.getElementById(`stake-${matchId}`) || document.getElementById(`stake_${matchId}`);
+  let scoreEl = document.getElementById(`score-${matchId}`);
+  let legacyHomeEl = null, legacyAwayEl = null;
+  if (!scoreEl) {
+    legacyHomeEl = document.getElementById(`home_${matchId}`);
+    legacyAwayEl = document.getElementById(`away_${matchId}`);
+  }
+  
+  if (!stakeEl || (!scoreEl && !(legacyHomeEl && legacyAwayEl))) {
+    console.error('Input elements not found:', matchId, { hasStake: !!stakeEl, hasScore: !!scoreEl, hasLegacy: !!legacyHomeEl && !!legacyAwayEl });
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Eingabefelder nicht gefunden.</span>';
+    return;
+  }
+  
+  const stake = parseInt(stakeEl.value || '0', 10);
+  let scorePred = '';
+  if (scoreEl) {
+    scorePred = (scoreEl.value || '').trim();
+  } else if (legacyHomeEl && legacyAwayEl) {
+    const hVal = legacyHomeEl.value != null ? String(legacyHomeEl.value) : '';
+    const aVal = legacyAwayEl.value != null ? String(legacyAwayEl.value) : '';
+    scorePred = `${hVal}:${aVal}`;
+  }
 
-  if (!stake || stake <= 0) { if (feedbackEl) feedbackEl.textContent = 'Bitte Einsatz angeben.'; return; }
+  if (!stake || stake < 5) { 
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#ffa500;">⚠️ Mindest-Einsatz: 5 Münzen.</span>'; 
+    safeNotify('Fehler', 'Mindest-Einsatz ist 5 Münzen!');
+    return; 
+  }
+  
+  if (!scorePred || !scorePred.includes(':')) { 
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#ffa500;">⚠️ Bitte Ergebnis-Tipp angeben (z.B. 2:1).</span>'; 
+    safeNotify('Fehler', 'Bitte gib einen Ergebnis-Tipp ein (z.B. 2:1)!');
+    return; 
+  }
+  
+  // Calculate tendency from score prediction
+  const scoreParts = scorePred.split(':');
+  if (scoreParts.length !== 2) {
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#ffa500;">⚠️ Ungültiges Format! Nutze z.B. 2:1.</span>';
+    safeNotify('Fehler', 'Ungültiges Format! Nutze z.B. 2:1');
+    return;
+  }
+  
+  const homeGoals = parseInt(scoreParts[0]);
+  const awayGoals = parseInt(scoreParts[1]);
+  
+  if (isNaN(homeGoals) || isNaN(awayGoals) || homeGoals < 0 || awayGoals < 0) {
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#ffa500;">⚠️ Bitte gültige Zahlen eingeben!</span>';
+    safeNotify('Fehler', 'Bitte gültige Zahlen eingeben!');
+    return;
+  }
+  
+  let tendency = 'X';
+  if (homeGoals > awayGoals) tendency = '1';
+  else if (homeGoals < awayGoals) tendency = '2';
 
   // Check if user has enough coins
   const userCoins = window.getUserCoins ? window.getUserCoins() : 0;
-  if (stake > userCoins) { if (feedbackEl) feedbackEl.textContent = 'Nicht genug Münzen!'; return; }
+  if (stake > userCoins) { 
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Nicht genug Münzen!</span>'; 
+    safeNotify('Fehler', `Du hast nur ${userCoins} Münzen!`);
+    return; 
+  }
 
   try {
-    const betsCol = collection(__matchdayDb, 'footballBets', uid, 'bets');
+    console.log('Placing bet...');
+    const betsCol = collection(__getDb(), 'footballBets', uid, 'bets');
     const betRef = doc(betsCol);
+    
     await setDoc(betRef, {
       betId: betRef.id,
       uid,
       league,
       matchId,
+      homeTeam: match.home || match.homeTeam || '',
+      awayTeam: match.away || match.awayTeam || '',
       stake,
       tendency,
       scorePred,
@@ -2283,19 +3017,50 @@ async function placeBet(league, matchId) {
       status: 'pending'
     });
 
+    console.log('Bet placed successfully, deducting coins...');
+    
     // Deduct coins after successful bet placement
-    await addCoins(-stake);
+    if (window.addCoins) {
+      await window.addCoins(-stake);
+    } else {
+      console.error('addCoins function not found');
+    }
 
-    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#28a745;">✅ Wette platziert! ' + stake + ' 🪙 abgezogen.</span>';
+    // Optimistic UI lock on this specific card (new renderer)
+    try {
+      const stakeEl = document.getElementById(`stake-${matchId}`);
+      const scoreEl = document.getElementById(`score-${matchId}`);
+      const btnEl = document.getElementById(`bet-btn-${matchId}`);
+      const confirmEl = document.getElementById(`bet-confirm-${matchId}`);
+      const cardEl = document.getElementById(`match-card-${matchId}`);
+      if (stakeEl) { stakeEl.setAttribute('disabled', 'disabled'); }
+      if (scoreEl) { scoreEl.setAttribute('disabled', 'disabled'); }
+      if (btnEl) { btnEl.setAttribute('disabled','disabled'); btnEl.textContent = '✅ Wette eingereicht'; }
+      if (confirmEl) { confirmEl.style.display = ''; }
+      if (cardEl) { cardEl.style.border = '1px solid #ffa500'; cardEl.style.background = '#3a3a2e'; }
+      if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#28a745; font-weight:600;">✅ Wette eingereicht</span>';
+    } catch(_) {}
+    // Legacy/live row lock (stake_/home_/away_/betbtn_)
+    try {
+      const lStake = document.getElementById(`stake_${matchId}`);
+      const lHome = document.getElementById(`home_${matchId}`);
+      const lAway = document.getElementById(`away_${matchId}`);
+      const lBtn = document.getElementById(`betbtn_${matchId}`);
+      if (lStake) lStake.setAttribute('disabled','disabled');
+      if (lHome) lHome.setAttribute('disabled','disabled');
+      if (lAway) lAway.setAttribute('disabled','disabled');
+      if (lBtn) { lBtn.setAttribute('disabled','disabled'); lBtn.textContent = '✅ Wette eingereicht'; }
+    } catch(_) {}
+    safeNotify('Erfolg', `✅ Wette platziert! ${stake} 🪙 abgezogen.`);
     
     // Reload display to show bet as placed
     setTimeout(() => {
       loadMatchday();
-      if (feedbackEl) feedbackEl.innerHTML = '';
-    }, 1500);
+    }, 1000);
   } catch (e) {
-    console.error('Bet error', e);
-    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">Fehler beim Wetten.</span>';
+    console.error('Bet error:', e);
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Wette konnte nicht platziert werden.</span>';
+    safeNotify('Fehler', 'Wette konnte nicht platziert werden: ' + e.message);
   }
 }
 
@@ -2310,7 +3075,7 @@ async function adminSetResult(league, matchId, finalHomeGoals, finalAwayGoals) {
   const tendencyFinal = finalHomeGoals === finalAwayGoals ? 'X' : (finalHomeGoals > finalAwayGoals ? '1' : '2');
   const finalScoreStr = `${finalHomeGoals}:${finalAwayGoals}`;
 
-  const betsSnap = await getDocs(query(collection(__matchdayDb, 'footballBets', uid, 'bets')));
+  const betsSnap = await getDocs(query(collection(__getDb(), 'footballBets', uid, 'bets')));
   const updates = [];
   betsSnap.forEach(docSnap => {
     const b = docSnap.data();
@@ -2326,7 +3091,7 @@ async function adminSetResult(league, matchId, finalHomeGoals, finalAwayGoals) {
   });
 
   for (const u of updates) {
-    await updateDoc(doc(__matchdayDb, 'footballBets', uid, 'bets', u.id), {
+    await updateDoc(doc(__getDb(), 'footballBets', uid, 'bets', u.id), {
       status: 'settled',
       settledAt: serverTimestamp(),
       finalScore: finalScoreStr,
@@ -2336,8 +3101,11 @@ async function adminSetResult(league, matchId, finalHomeGoals, finalAwayGoals) {
   }
 }
 
-// Expose admin to window for manual use
+// Expose functions globally for inline handlers
 window.adminSetResult = adminSetResult;
+window.loadMatchday = loadMatchday;
+window.placeBet = placeBet;
+window.refreshMatchLocks = refreshMatchLocks;
 
 // Initialisieren
 document.addEventListener('DOMContentLoaded', () => {
@@ -2358,6 +3126,49 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hard init render once DOM is ready
   loadMatchday();
 });
+</script>
+
+<!-- Global click rescue for Wetten buttons (works across all renderers) -->
+<script>
+// Last-resort click handler in capture phase to ensure responsiveness
+(function(){
+  function extractMatchContext(btn){
+    // Try id patterns first
+    if (btn.id && btn.id.indexOf('betbtn_')===0) return { id: btn.id.slice('betbtn_'.length) };
+    if (btn.id && btn.id.indexOf('bet-btn-')===0) return { id: btn.id.slice('bet-btn-'.length) };
+    // Fallback: search nearby stake/home inputs to infer id
+    const host = btn.closest && btn.closest('#fixturesList, .fixture-row, [id^="match-card-"]') || document;
+    let stake = host.querySelector('input[id^="stake_"]') || host.querySelector('input[id^="stake-"]');
+    if (stake && stake.id){
+      const sid = stake.id.replace(/^stake[-_]/,'');
+      return { id: sid };
+    }
+    return { id: null };
+  }
+  function currentLeague(){
+    const sel = document.getElementById('leagueSelect');
+    return (sel && sel.value) ? sel.value : 'EPL';
+  }
+  document.addEventListener('click', function(e){
+    const btn = e.target && e.target.closest && e.target.closest('button');
+    if (!btn) return;
+    const label = (btn.textContent || '').trim().toLowerCase();
+    const isBet = btn.id.startsWith('betbtn_') || btn.id.startsWith('bet-btn-') || label === 'wetten' || label.includes('wette');
+    if (!isBet) return;
+    if (btn.disabled) return;
+    const ctx = extractMatchContext(btn);
+    if (!ctx.id) return;
+    const lg = currentLeague();
+    try {
+      if (window.placeBet) {
+        console.debug('[global-capture] click → placeBet', lg, ctx.id);
+        window.placeBet(lg, ctx.id);
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    } catch(err){ console.error('global-capture placeBet error', err); }
+  }, true);
+})();
 </script>
 
 <!-- Datum ist nun in der Navigationsleiste platziert -->
@@ -2414,6 +3225,8 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
   
+  <!-- Removed duplicate Top Spiele section previously injected into Advent modal -->
+
 </div>
 
 <!-- Smart Notifications Feed (panel) -->
@@ -3076,37 +3889,32 @@ document.addEventListener('DOMContentLoaded', () => {
       <p style="font-size:11px; opacity:0.7; margin-top:6px;" data-i18n="flags_help">Erkenne die Flagge und tippe das Land ein. Groß-/Kleinschreibung egal.</p>
     </div>
 
-    <!-- Matchday Tips (Top 5 Ligen) -->
-    <div class="card game-item" style="min-width:360px; flex:0 0 360px;">
+    <!-- Matchday Tipps moved to Top Spiele section -->
+
+    <!-- Top Spiele section moved below the Spiele section -->
+  </div>
+
+  <!-- Top Spiele (separate section under Spiele) -->
+  <div id="topGames" class="section" style="max-width:1400px; width:100%; margin:auto;">
+    <h1>🔥 Top Spiele</h1>
+
+    <!-- ⚽ Spieltag Tipps (Top 5 Ligen) -->
+    <div class="card" id="matchdayTipsCard" style="max-width:1400px; width:100%; margin:0 auto;">
       <button id="setApiTokenBtn" style="float:right; margin-top:-8px; margin-right:-8px; background:#007bff; color:#fff; border-radius:6px; border:none; padding:6px 12px; font-size:13px; cursor:pointer; display:none;">API Token</button>
       <script>
-      // Button nur für Admin sichtbar machen (UID-Liste oder Flag)
       document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('setApiTokenBtn');
-        // Admin-UIDs hier eintragen:
-        const adminUids = ['adminuid1', 'adminuid2']; // <-- eigene Admin-UID(s) eintragen
-        function showIfAdmin() {
-          let uid = null;
-          if (window.firebase && firebase.auth && firebase.auth().currentUser) {
-            uid = firebase.auth().currentUser.uid;
-          } else if (window.getAuth && getAuth().currentUser) {
-            uid = getAuth().currentUser.uid;
-          }
-          if (uid && adminUids.includes(uid)) {
-            btn && (btn.style.display = '');
-          } else {
-            btn && (btn.style.display = 'none');
-          }
+        const adminUids = ['adminuid1','adminuid2'];
+        function showIfAdmin(){
+          let uid=null;
+          try{uid=(window.firebase&&firebase.auth&&firebase.auth().currentUser)?firebase.auth().currentUser.uid:(window.getAuth&&getAuth().currentUser?getAuth().currentUser.uid:null);}catch(e){}
+          btn && (btn.style.display = (uid && adminUids.includes(uid)) ? '' : 'none');
         }
-        // Direkt prüfen und bei Login-Änderung erneut prüfen
         showIfAdmin();
-        if (window.firebase && firebase.auth) {
-          firebase.auth().onAuthStateChanged(showIfAdmin);
-        }
+        if (window.firebase && firebase.auth) firebase.auth().onAuthStateChanged(showIfAdmin);
       });
       </script>
       <h3>⚽ Spieltag Tipps (Top 5 Ligen)</h3>
-      <!-- API Token Modal -->
       <div id="apiTokenModal" class="modal" style="display:none;">
         <div class="modal-content">
           <span class="close" id="apiTokenModalClose">×</span>
@@ -3118,7 +3926,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
       <script>
-      // API Token Modal logic
       document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('setApiTokenBtn');
         const modal = document.getElementById('apiTokenModal');
@@ -3127,43 +3934,353 @@ document.addEventListener('DOMContentLoaded', () => {
         const save = document.getElementById('apiTokenSaveBtn');
         const savedMsg = document.getElementById('apiTokenSavedMsg');
         if (btn && modal && close && input && save) {
-          btn.onclick = () => {
-            input.value = localStorage.getItem('footballDataToken') || '';
-            savedMsg.style.display = 'none';
-            modal.style.display = 'flex';
-            input.focus();
-          };
-          close.onclick = () => { modal.style.display = 'none'; };
-          save.onclick = () => {
-            localStorage.setItem('footballDataToken', input.value.trim());
-            savedMsg.style.display = '';
-            setTimeout(() => { savedMsg.style.display = 'none'; modal.style.display = 'none'; window.loadMatchday && window.loadMatchday(); }, 900);
-          };
+          btn.onclick = () => { input.value = localStorage.getItem('footballDataToken') || ''; savedMsg.style.display='none'; modal.style.display='flex'; input.focus(); };
+          close.onclick = () => { modal.style.display='none'; };
+          save.onclick = () => { localStorage.setItem('footballDataToken', input.value.trim()); savedMsg.style.display=''; setTimeout(()=>{ savedMsg.style.display='none'; modal.style.display='none'; window.loadMatchday && window.loadMatchday(); }, 900); };
         }
-        // Modal close on outside click
-        window.onclick = function(event) {
-          if (event.target === modal) modal.style.display = 'none';
-        };
+        window.onclick = function(event){ if(event.target===modal) modal.style.display='none'; };
       });
       </script>
       <p style="font-size:12px; opacity:0.8;">Tippe den nächsten Spieltag. Einsatz in Münzen. Richtiger Ergebnistipp: 3x Auszahlung. Richtige Tendenz (1X2): 2x. Falsch: Einsatz weg. Nach Spielstart gesperrt.</p>
       <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
         <label for="leagueSelect" style="font-weight:600;">Liga:</label>
-        <select id="leagueSelect" onchange="loadMatchday()" style="padding:6px; border-radius:6px;">
+        <select id="leagueSelect" onchange="window.loadMatchday && window.loadMatchday()" style="padding:6px; border-radius:6px;">
           <option value="EPL">Premier League</option>
           <option value="LL">La Liga</option>
           <option value="BL">Bundesliga</option>
           <option value="SA">Serie A</option>
           <option value="L1">Ligue 1</option>
         </select>
-        <button id="refreshLocksBtn" onclick="refreshMatchLocks()" style="padding:6px 10px;">🔄 Aktualisieren</button>
+        <button id="refreshLocksBtn" onclick="window.loadMatchday && window.loadMatchday()" style="padding:6px 10px;">🔄 Aktualisieren</button>
       </div>
       <div id="matchdayInfo" style="font-size:12px; opacity:0.7; margin-bottom:8px;"></div>
-      <div id="fixturesList" style="display:flex; flex-direction:column; gap:12px;"></div>
+      <div id="fixturesList" style="display:grid; grid-template-columns:repeat(2, minmax(300px, 1fr)); gap:20px;"></div>
       <div id="betFeedback" style="margin-top:10px; font-weight:bold; font-size:14px;"></div>
     </div>
 
+    <!-- 🎰 Slot Maschine XXL (3 x 5) -->
+    <div class="card" id="slotXXLCard" style="max-width:1400px; width:100%; margin:20px auto;">
+      <h3>🎰 Slot Maschine XXL</h3>
+      <div style="margin-bottom:10px; display:flex; gap:10px; align-items:center;">
+        <label>Einsatz:</label>
+        <input id="slotXXLStake" type="number" min="100" value="100" style="width:100px;">
+        <span>💰 Deine Münzen: <b id="slotXXLBalance">0</b></span>
+        <button id="slotXXLSpin" onclick="spinSlotXXL()" style="margin-left:auto; padding:8px 16px;">SPIN! 🎯</button>
+      </div>
+      <div id="slotXXLGrid" style="display:grid; grid-template-columns:repeat(5, 110px); grid-auto-rows:110px; gap:10px; justify-content:center;">
+        <div class="slot-xxl-cell" id="slotXXL-0"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-1"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-2"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-3"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-4"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-5"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-6"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-7"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-8"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-9"  style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-10" style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-11" style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-12" style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-13" style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+        <div class="slot-xxl-cell" id="slotXXL-14" style="display:flex; align-items:center; justify-content:center; font-size:42px; background:#1a1a2e; border:1px solid #444; border-radius:8px;">🍒</div>
+      </div>
+      <p id="slotXXLResult" style="text-align:center; font-weight:bold; margin-top:12px; min-height:24px;"></p>
+    </div>
   </div>
+
+  <script>
+  // XXL SLOT MACHINE - Warte auf vollständiges Laden aller Abhängigkeiten
+  (function() {
+  const SYMBOLS_XXL = ["🍒", "🍋", "🍉", "🍇", "🥝", "🍓", "🍊", "🍑", "🍌", "🍍", "🥭", "🍎", "7️⃣"];
+  let slotXXLReels = ["🍒", "🍋", "🍉", "🍇", "🥝", "🍓", "🍊", "🍑", "🍌", "🍍", "🥭", "🍎", "7️⃣", "🍒", "🍋"];
+  let isXXLSpinning = false;
+
+  // Update Balance Anzeige
+  function updateSlotXXLBalance() {
+    const coins = window.getUserCoins ? window.getUserCoins() : 0;
+    const el = document.getElementById("slotXXLBalance");
+    if (el) el.textContent = coins;
+  }
+
+  // Gewinn-Prüfung für 3x5 Grid - Horizontale, Vertikale, Diagonalen
+  function checkXXLWin(reels) {
+    let totalMultiplier = 0;
+    let allWins = [];
+
+    // Prüfe alle Gewinnlinien
+    const winLines = [
+      // Horizontale Linien
+      { name: 'Zeile 1', cells: [0,1,2,3,4], positions: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
+      { name: 'Zeile 2', cells: [5,6,7,8,9], positions: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
+      { name: 'Zeile 3', cells: [10,11,12,13,14], positions: [[2,0],[2,1],[2,2],[2,3],[2,4]] },
+      // Vertikale Linien (oben nach unten)
+      { name: 'Spalte 1', cells: [0,5,10], positions: [[0,0],[1,0],[2,0]] },
+      { name: 'Spalte 2', cells: [1,6,11], positions: [[0,1],[1,1],[2,1]] },
+      { name: 'Spalte 3', cells: [2,7,12], positions: [[0,2],[1,2],[2,2]] },
+      { name: 'Spalte 4', cells: [3,8,13], positions: [[0,3],[1,3],[2,3]] },
+      { name: 'Spalte 5', cells: [4,9,14], positions: [[0,4],[1,4],[2,4]] },
+      // Diagonalen links nach rechts (oben-links → unten-rechts)
+      { name: 'Diagonale ↘', cells: [0,6,12], positions: [[0,0],[1,1],[2,2]] },
+      { name: 'Diagonale ↘', cells: [1,7,13], positions: [[0,1],[1,2],[2,3]] },
+      { name: 'Diagonale ↘', cells: [2,8,14], positions: [[0,2],[1,3],[2,4]] },
+      // Diagonalen rechts nach links (oben-rechts → unten-links)
+      { name: 'Diagonale ↙', cells: [4,8,12], positions: [[0,4],[1,3],[2,2]] },
+      { name: 'Diagonale ↙', cells: [3,7,11], positions: [[0,3],[1,2],[2,1]] },
+      { name: 'Diagonale ↙', cells: [2,6,10], positions: [[0,2],[1,1],[2,0]] },
+    ];
+
+    winLines.forEach(line => {
+      const symbols = line.cells.map(idx => reels[idx]);
+      
+      // Prüfe ALLE möglichen Startpositionen für aufeinanderfolgende Symbole
+      for (let start = 0; start < symbols.length; start++) {
+        let consecutiveCount = 1;
+        let symbol = symbols[start];
+        
+        // Zähle aufeinanderfolgende gleiche Symbole ab dieser Startposition
+        for (let i = start + 1; i < symbols.length; i++) {
+          if (symbols[i] === symbol) {
+            consecutiveCount++;
+          } else {
+            break;
+          }
+        }
+        
+        // Gewinn berechnen
+        if (consecutiveCount >= 3) {
+          let multiplier = 0;
+          let type = 'lose';
+
+          if (consecutiveCount === 5) {
+            if (symbol === "7️⃣") {
+              multiplier = 20;
+              type = "seven-jackpot";
+            } else {
+              multiplier = 10;
+              type = "jackpot";
+            }
+          } else if (consecutiveCount === 4) {
+            multiplier = symbol === "7️⃣" ? 8 : 4;
+            type = "quad";
+          } else if (consecutiveCount === 3) {
+            multiplier = symbol === "7️⃣" ? 4 : 2;
+            type = "triple";
+          }
+
+          totalMultiplier += multiplier;
+          // Speichere nur die Positionen der gewinnenden Symbole
+          const winningCells = line.cells.slice(start, start + consecutiveCount);
+          const winningPositions = line.positions.slice(start, start + consecutiveCount);
+          allWins.push({ 
+            type, 
+            multiplier, 
+            count: consecutiveCount, 
+            symbol, 
+            line: line.name,
+            cells: winningCells,
+            positions: winningPositions
+          });
+          
+          // Breche nach dem ersten Gewinn in dieser Linie ab (keine Dopplungen)
+          break;
+        }
+      }
+    });
+
+    if (totalMultiplier > 0) {
+      return { 
+        type: 'win', 
+        multiplier: totalMultiplier, 
+        wins: allWins 
+      };
+    }
+
+    return { type: 'lose', multiplier: 0, wins: [] };
+  }
+
+  // Zeige Gewinnlinien visuell
+  function showWinLines(wins) {
+    // Entferne alte Linien
+    clearWinLines();
+    
+    if (!wins || wins.length === 0) return;
+
+    // Markiere gewinnende Zellen
+    wins.forEach((win, winIndex) => {
+      win.cells.forEach(cellIdx => {
+        const cell = document.getElementById(`slotXXL-${cellIdx}`);
+        if (cell) {
+          cell.style.boxShadow = '0 0 20px 5px #ff0000, inset 0 0 20px 5px rgba(255,0,0,0.3)';
+          cell.style.border = '3px solid #ff0000';
+        }
+      });
+    });
+  }
+
+  function clearWinLines() {
+    for (let i = 0; i < 15; i++) {
+      const cell = document.getElementById(`slotXXL-${i}`);
+      if (cell) {
+        cell.style.boxShadow = '';
+        cell.style.border = '1px solid #444';
+      }
+    }
+  }
+
+  // Spin animieren
+  async function animateXXLSlotSpin() {
+    return new Promise(resolve => {
+      let spinCount = 0;
+      const maxSpins = 20;
+      
+      const spinInterval = setInterval(() => {
+        // Zufällige Symbole
+        for (let i = 0; i < 15; i++) {
+          slotXXLReels[i] = SYMBOLS_XXL[Math.floor(Math.random() * SYMBOLS_XXL.length)];
+          const cell = document.getElementById(`slotXXL-${i}`);
+          if (cell) {
+            cell.textContent = slotXXLReels[i];
+            cell.classList.add("spinning");
+          }
+        }
+        
+        spinCount++;
+        if (spinCount >= maxSpins) {
+          clearInterval(spinInterval);
+          
+          // Spinning-Klasse entfernen
+          for (let i = 0; i < 15; i++) {
+            const cell = document.getElementById(`slotXXL-${i}`);
+            if (cell) cell.classList.remove("spinning"); 
+          }
+          
+          resolve();
+        }
+      }, 100);
+    });
+  }
+
+  // Haupt-Spin Funktion
+  window.spinSlotXXL = async function() {
+    if (isXXLSpinning) return;
+    
+    // Prüfe ob User eingeloggt ist - nutze alle verfügbaren Auth-Methoden
+    const user = window.currentUser || (typeof auth !== 'undefined' && auth.currentUser) || (window.auth && window.auth.currentUser);
+    if (!user) {
+      showNotification("Fehler", "Bitte einloggen zum Spielen!");
+      return;
+    }
+    
+    const bet = parseInt(document.getElementById("slotXXLStake").value) || 0;
+    
+    if (bet < 100) {
+      showNotification("Fehler", "Mindesteinsatz für XXL Slot ist 100 Münzen!");
+      return;
+    }
+    
+    // Hole aktuelle Münzen direkt von der getUserCoins Funktion
+    const coins = window.getUserCoins ? window.getUserCoins() : (window.userCoins || 0);
+    if (bet > coins) {
+      showNotification("Fehler", `Du hast nicht genug Münzen! Du hast ${coins}, brauchst aber ${bet}.`);
+      return;
+    }
+    
+    isXXLSpinning = true;
+    document.getElementById("slotXXLSpin").disabled = true;
+    document.getElementById("slotXXLResult").textContent = "";
+    
+    // Einsatz abziehen - verwende window.addCoins falls verfügbar
+    if (window.addCoins) {
+      await window.addCoins(-bet);
+    } else {
+      console.error("addCoins function not available");
+    }
+    updateSlotXXLBalance();
+    
+    // Spin Sound
+    if (window.playSpinSound) window.playSpinSound();
+    
+    // Lösche alte Gewinnlinien
+    clearWinLines();
+    
+    // Animiere
+    await animateXXLSlotSpin();
+    
+    // Prüfe Gewinn
+    const result = checkXXLWin(slotXXLReels);
+    let winAmount = bet * result.multiplier;
+    let resultText = "";
+
+    if (result.wins && result.wins.length > 0) {
+      // Zeige Gewinnlinien visuell
+      showWinLines(result.wins);
+      
+      // Gewinne anzeigen
+      const winLines = result.wins.map(w => {
+        let desc = '';
+        if (w.count === 5) desc = w.symbol === "7️⃣" ? "SIEBEN-JACKPOT!" : "JACKPOT!";
+        else if (w.count === 4) desc = "4x";
+        else if (w.count === 3) desc = "3x";
+        return `${desc} ${w.symbol} (${w.line})`;
+      }).join(' + ');
+      
+      resultText = `🎉 GEWINN! ${winLines} = +${winAmount} Münzen!`;
+      if (window.playWinSound) window.playWinSound();
+    } else {
+      resultText = "❌ Verloren! Versuch es nochmal!";
+      if (window.playLoseSound) window.playLoseSound();
+    }
+
+    if (winAmount > 0) {
+      if (window.addCoins) {
+        await window.addCoins(winAmount);
+      }
+      
+      // Speichere höchsten Slot-Gewinn
+      const user = window.currentUser || (window.auth && window.auth.currentUser);
+      if (user && window.getDoc && window.updateDoc && window.doc && window.db) {
+        const userDoc = await window.getDoc(window.doc(window.db, 'users', user.uid));
+        const currentHighWin = userDoc.exists() ? (userDoc.data().slotHighWin || 0) : 0;
+        
+        if (winAmount > currentHighWin) {
+          await window.updateDoc(window.doc(window.db, 'users', user.uid), { 
+            slotHighWin: winAmount 
+          });
+        }
+      }
+      
+      // Track Slot Winnings für Battle Pass
+      if (window.updateBPQuestProgress) {
+        await window.updateBPQuestProgress('slotWins', winAmount);
+      }
+      
+      // Track Jackpot für Battle Pass
+      if ((result.type === 'jackpot' || result.type === 'seven-jackpot') && window.updateBPQuestProgress) {
+        await window.updateBPQuestProgress('jackpot', 1);
+      }
+    }
+
+    updateSlotXXLBalance();
+    document.getElementById("slotXXLResult").textContent = resultText;
+
+    isXXLSpinning = false;
+    document.getElementById("slotXXLSpin").disabled = false;
+  };
+
+  window.resetSlotXXL = function() {
+    document.getElementById("slotXXLResult").textContent = "";
+    document.getElementById("slotXXLStake").value = "100";
+    updateSlotXXLBalance();
+  };
+
+  // Init beim Start
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateSlotXXLBalance);
+  } else {
+    updateSlotXXLBalance();
+  }
+  })(); // Ende IIFE
+  </script>
 
   <!-- Snake Ranking Modal -->
   <div id="snakeRankingModal" class="auth-modal">
@@ -3630,8 +4747,15 @@ const ADMIN_EMAIL = "felixhorschke19@gmail.com";
 // Firebase initialisieren
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
+window.auth = auth; // Expose globally for XXL Slot access
 const db = getFirestore();
+window.db = db; // Expose globally for XXL Slot access
 const storage = getStorage();
+
+// Expose Firestore functions globally for XXL Slot
+window.getDoc = getDoc;
+window.updateDoc = updateDoc;
+window.doc = doc;
 
 // globaler User/Nickname
 let currentUser = null;
@@ -5109,6 +6233,36 @@ const ADVENT_REWARDS = {
   24: { coins: 500, bp: 5, chatColor: { id: 'advent_christmas_magic', name: 'Weihnachtszauber', color: 'linear-gradient(90deg, #ff0000, #00ff00, #ffffff, #ff0000)', exclusive: true }, theme: { id: 'advent_holy_night', name: 'Heilige Nacht', preview: 'linear-gradient(135deg, #0a1930, #1e3a5f, #0d2540)', exclusive: true }, badge: { id: 'advent_santa_hat', name: 'Weihnachtsmann-Mütze', icon: '🎅', exclusive: true } }
 };
 
+// Prepare merge function; will be called after catalogs are defined
+function mergeAdventRewardsIntoCatalogs(){
+  try {
+    const days = Object.keys(ADVENT_REWARDS || {});
+    for (const d of days) {
+      const r = ADVENT_REWARDS[d];
+      if (r && r.chatColor) {
+        if (!CHAT_COLORS.find(c => c.id === r.chatColor.id)) {
+          CHAT_COLORS.push(r.chatColor);
+        }
+      }
+      if (r && r.theme) {
+        if (!WEBSITE_THEMES.find(t => t.id === r.theme.id)) {
+          WEBSITE_THEMES.push({
+            id: r.theme.id,
+            name: r.theme.name,
+            price: 0,
+            preview: r.theme.preview || '#000',
+            accent: r.theme.accent || '#0099ff',
+            bg: r.theme.bg || '#111',
+            exclusive: true
+          });
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('mergeAdventRewardsIntoCatalogs failed:', e);
+  }
+}
+
 async function claimTodayAdvent() {
   if (!currentUser) { showNotification('Fehler','Bitte einloggen!'); return; }
   const today = new Date();
@@ -5146,6 +6300,14 @@ async function claimTodayAdvent() {
       if (!CHAT_COLORS.find(c => c.id === reward.chatColor.id)) {
         CHAT_COLORS.push(reward.chatColor);
       }
+      // Persist also in inventory subcollection for durability
+      try {
+        const colorRef = doc(db, 'inventory', currentUser.uid, 'chatColors', reward.chatColor.id);
+        const colorSnap = await getDoc(colorRef);
+        if (!colorSnap.exists()) {
+          await setDoc(colorRef, { ts: Date.now(), name: reward.chatColor.name, color: reward.chatColor.color });
+        }
+      } catch (_) {}
       rewardText += `\n🎨 ${reward.chatColor.name}`;
     }
   }
@@ -5158,6 +6320,14 @@ async function claimTodayAdvent() {
       if (!WEBSITE_THEMES.find(t => t.id === reward.theme.id)) {
         WEBSITE_THEMES.push(reward.theme);
       }
+      // Persist also in inventory subcollection for durability
+      try {
+        const themeRef = doc(db, 'inventory', currentUser.uid, 'themes', reward.theme.id);
+        const themeSnap = await getDoc(themeRef);
+        if (!themeSnap.exists()) {
+          await setDoc(themeRef, { ts: Date.now(), name: reward.theme.name, preview: reward.theme.preview || '' });
+        }
+      } catch (_) {}
       rewardText += `\n🌈 ${reward.theme.name}`;
     }
   }
@@ -5166,6 +6336,14 @@ async function claimTodayAdvent() {
     if (!userInventory.badges) userInventory.badges = [];
     if (!userInventory.badges.find(b => b.id === reward.badge.id)) {
       userInventory.badges.push(reward.badge);
+      // Persist also in inventory subcollection for durability
+      try {
+        const badgeRef = doc(db, 'inventory', currentUser.uid, 'badges', reward.badge.id);
+        const badgeSnap = await getDoc(badgeRef);
+        if (!badgeSnap.exists()) {
+          await setDoc(badgeRef, { ts: Date.now(), name: reward.badge.name, icon: reward.badge.icon || '' });
+        }
+      } catch (_) {}
       rewardText += `\n🏅 ${reward.badge.name}`;
     }
   }
@@ -5200,6 +6378,85 @@ async function claimTodayAdvent() {
   displayInventory();
   displayShop();
 }
+
+// Backfill/migrate previously claimed Advent rewards into persistent inventory
+async function syncAdventClaimsToInventory() {
+  try {
+    if (!currentUser || !db) return;
+    const uid = currentUser.uid;
+    const claimsCol = collection(db, 'adventClaims', uid, 'claims');
+    const snaps = await getDocs(claimsCol);
+    let changed = false;
+    for (const docSnap of snaps.docs) {
+      const data = docSnap.data() || {};
+      const reward = data.reward || {};
+      if (reward.chatColor) {
+        const c = reward.chatColor;
+        if (!CHAT_COLORS.find(x => x.id === c.id)) CHAT_COLORS.push(c);
+        if (!userInventory.chatColorsOwned) userInventory.chatColorsOwned = [];
+        if (!userInventory.chatColorsOwned.includes(c.id)) {
+          userInventory.chatColorsOwned.push(c.id);
+          changed = true;
+        }
+        try {
+          const ref = doc(db, 'inventory', uid, 'chatColors', c.id);
+          const snap = await getDoc(ref);
+          if (!snap.exists()) await setDoc(ref, { ts: Date.now(), name: c.name, color: c.color });
+        } catch(_){}
+      }
+      if (reward.theme) {
+        const t = reward.theme;
+        if (!WEBSITE_THEMES.find(x => x.id === t.id)) {
+          WEBSITE_THEMES.push({ id: t.id, name: t.name, price: 0, preview: t.preview || '#000', accent: t.accent || '#0099ff', bg: t.bg || '#111', exclusive: true });
+        }
+        if (!userInventory.themesOwned) userInventory.themesOwned = ['default','dark'];
+        if (!userInventory.themesOwned.includes(t.id)) {
+          userInventory.themesOwned.push(t.id);
+          changed = true;
+        }
+        try {
+          const ref = doc(db, 'inventory', uid, 'themes', t.id);
+          const snap = await getDoc(ref);
+          if (!snap.exists()) await setDoc(ref, { ts: Date.now(), name: t.name, preview: t.preview || '' });
+        } catch(_){}
+      }
+      if (reward.badge) {
+        const b = reward.badge;
+        if (!userInventory.badges) userInventory.badges = [];
+        if (!userInventory.badges.find(x => x.id === b.id)) {
+          userInventory.badges.push({ id: b.id, name: b.name, icon: b.icon });
+          changed = true;
+        }
+        try {
+          const ref = doc(db, 'inventory', uid, 'badges', b.id);
+          const snap = await getDoc(ref);
+          if (!snap.exists()) await setDoc(ref, { ts: Date.now(), name: b.name, icon: b.icon || '' });
+        } catch(_){}
+      }
+      if (reward.music) {
+        const m = reward.music; try {
+          const ref = doc(db, 'inventory', uid, 'music', m.id);
+          const snap = await getDoc(ref); if (!snap.exists()) await setDoc(ref, { ts: Date.now(), name: m.name });
+        } catch(_){}
+      }
+      if (reward.font) {
+        const f = reward.font; try {
+          const ref = doc(db, 'inventory', uid, 'fonts', f.id);
+          const snap = await getDoc(ref); if (!snap.exists()) await setDoc(ref, { ts: Date.now(), name: f.name });
+        } catch(_){}
+      }
+    }
+    if (changed) {
+      await saveInventory();
+      displayInventory();
+    }
+  } catch (e) {
+    console.warn('syncAdventClaimsToInventory failed:', e);
+  }
+}
+
+// Expose for manual triggering via console if needed
+try { window.syncAdventClaimsToInventory = syncAdventClaimsToInventory; } catch(_) {}
 
 /////////////////////////////////////////////////////////////////////////////
 // Smart Notifications Feed
@@ -5426,6 +6683,9 @@ async function addCoins(amount) {
   }
 }
 
+// Expose addCoins globally for XXL Slot
+window.addCoins = addCoins;
+
 // Helper: Get current user coins (for bet max validation)
 window.getUserCoins = function() {
   return userCoins || 0;
@@ -5493,6 +6753,9 @@ async function updateBPQuestProgress(questType, value = 1) {
   await saveBattlePassData();
   displayBattlePass();
 }
+
+// Expose updateBPQuestProgress globally for XXL Slot
+window.updateBPQuestProgress = updateBPQuestProgress;
 
 // Track "verschiedene Spiele gespielt" (einzigartig pro Tag)
 async function trackGamePlayed(gameId) {
@@ -6547,7 +7810,7 @@ window.openUserProfile = async function(uid) {
     if (nameColor) {
       const colorData = CHAT_COLORS.find(c => c.id === nameColor);
       if (colorData) {
-        // Spezialeffekte (Santa, Holly, Icy) via data-color-id
+        // Spezialeffekte (Santa, Holly, Icy, Advent colors) via data-color-id
         if (nameColor === 'santa_red') {
           nicknameEl.setAttribute('data-color-id', 'santa');
           nicknameEl.style.color = '';
@@ -6556,6 +7819,18 @@ window.openUserProfile = async function(uid) {
           nicknameEl.style.color = '';
         } else if (nameColor === 'icy_blue') {
           nicknameEl.setAttribute('data-color-id', 'icy');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'advent_snow_white') {
+          nicknameEl.setAttribute('data-color-id', 'advent_snow');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'advent_christmas_red') {
+          nicknameEl.setAttribute('data-color-id', 'advent_xmas');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'advent_golden_star') {
+          nicknameEl.setAttribute('data-color-id', 'advent_gold_star');
+          nicknameEl.style.color = '';
+        } else if (nameColor === 'advent_christmas_magic') {
+          nicknameEl.setAttribute('data-color-id', 'advent_magic');
           nicknameEl.style.color = '';
         } else if (nameColor === 'gold') {
           nicknameEl.setAttribute('data-color-id', 'gold');
@@ -7038,6 +8313,14 @@ onAuthStateChanged(auth, async user => {
         nameSpan.setAttribute('data-color-id', 'holly');
       } else if (nameColor === 'icy_blue') {
         nameSpan.setAttribute('data-color-id', 'icy');
+      } else if (nameColor === 'advent_snow_white') {
+        nameSpan.setAttribute('data-color-id', 'advent_snow');
+      } else if (nameColor === 'advent_christmas_red') {
+        nameSpan.setAttribute('data-color-id', 'advent_xmas');
+      } else if (nameColor === 'advent_golden_star') {
+        nameSpan.setAttribute('data-color-id', 'advent_gold_star');
+      } else if (nameColor === 'advent_christmas_magic') {
+        nameSpan.setAttribute('data-color-id', 'advent_magic');
       } else if (nameColor === 'gold') {
         nameSpan.setAttribute('data-color-id', 'gold');
       } else if (nameColor === 'ruby_red') {
@@ -7074,6 +8357,8 @@ onAuthStateChanged(auth, async user => {
     loadUserCoins();
     checkDailyBonus();
     await loadUserInventory();
+    // Backfill any previously claimed Advent items into inventory
+    await syncAdventClaimsToInventory();
     displayInventory();
     
     // Prüfe Freundesanfragen und Nachrichten für Badge
@@ -7266,6 +8551,10 @@ async function loadNews() {
         if (cId === 'santa_red') return `<span data-color-id="santa">${nn}</span>`;
         if (cId === 'holly_green') return `<span data-color-id="holly">${nn}</span>`;
         if (cId === 'icy_blue') return `<span data-color-id="icy">${nn}</span>`;
+        if (cId === 'advent_snow_white') return `<span data-color-id="advent_snow">${nn}</span>`;
+        if (cId === 'advent_christmas_red') return `<span data-color-id="advent_xmas">${nn}</span>`;
+        if (cId === 'advent_golden_star') return `<span data-color-id="advent_gold_star">${nn}</span>`;
+        if (cId === 'advent_christmas_magic') return `<span data-color-id="advent_magic">${nn}</span>`;
         if (cId) {
           const c = CHAT_COLORS.find(x => x.id === cId);
           if (c) return `<span style="color:${c.color}">${nn}</span>`;
@@ -7703,6 +8992,10 @@ window.loadTTTRankings = async function() {
               if (cId === 'santa_red') return '<span data-color-id="santa">' + player.nickname + '</span>';
               if (cId === 'holly_green') return '<span data-color-id="holly">' + player.nickname + '</span>';
               if (cId === 'icy_blue') return '<span data-color-id="icy">' + player.nickname + '</span>';
+              if (cId === 'advent_snow_white') return '<span data-color-id="advent_snow">' + player.nickname + '</span>';
+              if (cId === 'advent_christmas_red') return '<span data-color-id="advent_xmas">' + player.nickname + '</span>';
+              if (cId === 'advent_golden_star') return '<span data-color-id="advent_gold_star">' + player.nickname + '</span>';
+              if (cId === 'advent_christmas_magic') return '<span data-color-id="advent_magic">' + player.nickname + '</span>';
               if (cId === 'gold') return '<span data-color-id="gold">' + player.nickname + '</span>';
               if (cId === 'ruby_red') return '<span data-color-id="ruby">' + player.nickname + '</span>';
               if (cId === 'emerald') return '<span data-color-id="emerald">' + player.nickname + '</span>';
@@ -11505,6 +12798,10 @@ async function loadPenaltyRankings(mode) {
               if (cId === 'santa_red') return '<span data-color-id="santa">' + item.nickname + '</span>';
               if (cId === 'holly_green') return '<span data-color-id="holly">' + item.nickname + '</span>';
               if (cId === 'icy_blue') return '<span data-color-id="icy">' + item.nickname + '</span>';
+              if (cId === 'advent_snow_white') return '<span data-color-id="advent_snow">' + item.nickname + '</span>';
+              if (cId === 'advent_christmas_red') return '<span data-color-id="advent_xmas">' + item.nickname + '</span>';
+              if (cId === 'advent_golden_star') return '<span data-color-id="advent_gold_star">' + item.nickname + '</span>';
+              if (cId === 'advent_christmas_magic') return '<span data-color-id="advent_magic">' + item.nickname + '</span>';
               if (cId === 'gold') return '<span data-color-id="gold">' + item.nickname + '</span>';
               if (cId === 'ruby_red') return '<span data-color-id="ruby">' + item.nickname + '</span>';
               if (cId === 'emerald') return '<span data-color-id="emerald">' + item.nickname + '</span>';
@@ -12427,6 +13724,9 @@ const WEBSITE_THEMES = [
   }
 ];
 
+// Merge Advent items into catalogs now that arrays exist
+try { mergeAdventRewardsIntoCatalogs(); } catch(_) {}
+
 // Verfügbare Badges im Shop
 const AVAILABLE_BADGES = [
   { id: "admin", name: "Admin", icon: "⚡", price: 0, exclusive: true },
@@ -12556,6 +13856,9 @@ function applyUserTheme() {
   document.body.classList.remove("aurora-borealis-theme");
   document.body.classList.remove("midnight-purple-theme");
   document.body.classList.remove("frosty-night-theme");
+  document.body.classList.remove("advent-crystal-palace-theme");
+  document.body.classList.remove("advent-northern-lights-theme");
+  document.body.classList.remove("advent-holy-night-theme");
   
   // Entferne alte Zahlen
   document.querySelectorAll('.number-floating').forEach(el => el.remove());
@@ -12599,6 +13902,24 @@ function applyUserTheme() {
     document.body.classList.add("frosty-night-theme");
     if (typeof themeToggle !== 'undefined' && themeToggle) themeToggle.textContent = "Standard";
     enableSnowfall();
+  }
+  // Spezialbehandlung für "Kristallpalast" Advent Theme
+  else if (theme.id === "advent_crystal_palace") {
+    document.body.classList.add("advent-crystal-palace-theme");
+    if (typeof themeToggle !== 'undefined' && themeToggle) themeToggle.textContent = "Standard";
+    disableSnowfall();
+  }
+  // Spezialbehandlung für "Nordlichter" Advent Theme
+  else if (theme.id === "advent_northern_lights") {
+    document.body.classList.add("advent-northern-lights-theme");
+    if (typeof themeToggle !== 'undefined' && themeToggle) themeToggle.textContent = "Standard";
+    disableSnowfall();
+  }
+  // Spezialbehandlung für "Heilige Nacht" Advent Theme
+  else if (theme.id === "advent_holy_night") {
+    document.body.classList.add("advent-holy-night-theme");
+    if (typeof themeToggle !== 'undefined' && themeToggle) themeToggle.textContent = "Standard";
+    disableSnowfall();
   }
   // Dezember-Themes: Snowfall aktivieren
   else if (theme.id === "winter_wonderland" || theme.id === "candy_cane") {
@@ -14326,6 +15647,11 @@ function playLoseSound() {
   osc.stop(now + 0.3);
 }
 
+// Expose sound functions globally for XXL Slot
+window.playSpinSound = playSpinSound;
+window.playWinSound = playWinSound;
+window.playLoseSound = playLoseSound;
+
 // Update Balance Anzeige
 function updateSlotBalance() {
   document.getElementById("slotBalance").textContent = userCoins;
@@ -14753,6 +16079,10 @@ async function loadSnakeRankings(mode) {
               if (cId === 'santa_red') return '<span data-color-id="santa">' + item.nickname + '</span>';
               if (cId === 'holly_green') return '<span data-color-id="holly">' + item.nickname + '</span>';
               if (cId === 'icy_blue') return '<span data-color-id="icy">' + item.nickname + '</span>';
+              if (cId === 'advent_snow_white') return '<span data-color-id="advent_snow">' + item.nickname + '</span>';
+              if (cId === 'advent_christmas_red') return '<span data-color-id="advent_xmas">' + item.nickname + '</span>';
+              if (cId === 'advent_golden_star') return '<span data-color-id="advent_gold_star">' + item.nickname + '</span>';
+              if (cId === 'advent_christmas_magic') return '<span data-color-id="advent_magic">' + item.nickname + '</span>';
               if (cId === 'gold') return '<span data-color-id="gold">' + item.nickname + '</span>';
               if (cId === 'ruby_red') return '<span data-color-id="ruby">' + item.nickname + '</span>';
               if (cId === 'emerald') return '<span data-color-id="emerald">' + item.nickname + '</span>';
