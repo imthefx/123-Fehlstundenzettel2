@@ -1427,78 +1427,39 @@ body.advent-crystal-palace-theme button:hover {
 /* Nordlichter (Northern Lights) - Aurora waves animation */
 @keyframes auroraWave {
   0% {
-    background-position: 0% 0%, 100% 100%, 50% 50%;
+    background-position: 0% 50%;
   }
-  33% {
-    background-position: 100% 50%, 0% 50%, 75% 25%;
-  }
-  66% {
-    background-position: 50% 100%, 50% 0%, 25% 75%;
+  50% {
+    background-position: 100% 50%;
   }
   100% {
-    background-position: 0% 0%, 100% 100%, 50% 50%;
+    background-position: 0% 50%;
   }
-}
-
-@keyframes auroraPulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.1); }
-}
-
-@keyframes auroraShift {
-  0% { filter: hue-rotate(0deg) brightness(1); }
-  50% { filter: hue-rotate(20deg) brightness(1.15); }
-  100% { filter: hue-rotate(0deg) brightness(1); }
 }
 
 body.advent-northern-lights-theme {
-  background: 
-    linear-gradient(135deg, #1a237e 0%, #311b92 25%, #4a148c 50%, #1b5e20 75%, #004d40 100%),
-    radial-gradient(ellipse at top, rgba(0, 255, 136, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba(139, 69, 255, 0.3) 0%, transparent 50%);
-  background-size: 400% 400%, 100% 100%, 100% 100%;
-  animation: auroraWave 15s ease-in-out infinite, auroraShift 10s ease-in-out infinite;
+  background: linear-gradient(135deg, 
+    #1a237e 0%, 
+    #00ff88 10%,
+    #8b45ff 20%,
+    #1b5e20 30%,
+    #00ff88 40%,
+    #4a148c 50%,
+    #06b6d4 60%,
+    #1a237e 70%,
+    #8b45ff 80%,
+    #004d40 90%,
+    #1a237e 100%
+  );
+  background-size: 400% 400%;
+  animation: auroraWave 20s ease-in-out infinite;
   color: #e0f7ff;
-  position: relative;
-}
-
-body.advent-northern-lights-theme::before {
-  content: '';
-  position: fixed;
-  top: -50%; left: -50%;
-  width: 200%; height: 200%;
-  background: 
-    radial-gradient(ellipse at 30% 20%, rgba(0, 255, 136, 0.4) 0%, transparent 40%),
-    radial-gradient(ellipse at 70% 80%, rgba(139, 69, 255, 0.4) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%);
-  animation: auroraPulse 8s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-body.advent-northern-lights-theme::after {
-  content: '';
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: 
-    linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(0, 255, 136, 0.1) 25%,
-      rgba(139, 69, 255, 0.1) 50%,
-      rgba(6, 182, 212, 0.1) 75%,
-      transparent 100%
-    );
-  background-size: 200% 100%;
-  animation: auroraWave 20s linear infinite;
-  pointer-events: none;
-  z-index: -1;
 }
 
 body.advent-northern-lights-theme .card,
 body.advent-northern-lights-theme .date-box,
 body.advent-northern-lights-theme .chat-box {
-  background: rgba(10, 20, 40, 0.85);
+  background: rgba(10, 20, 40, 0.9);
   backdrop-filter: blur(15px);
   border: 2px solid rgba(0, 255, 136, 0.3);
   box-shadow: 
@@ -1506,8 +1467,6 @@ body.advent-northern-lights-theme .chat-box {
     0 0 20px rgba(139, 69, 255, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   color: #e0f7ff;
-  position: relative;
-  z-index: 1;
 }
 
 body.advent-northern-lights-theme nav {
@@ -1517,8 +1476,6 @@ body.advent-northern-lights-theme nav {
   box-shadow: 
     0 4px 20px rgba(0, 255, 136, 0.3),
     0 0 40px rgba(139, 69, 255, 0.2);
-  position: relative;
-  z-index: 10;
 }
 
 body.advent-northern-lights-theme nav a,
@@ -1561,12 +1518,12 @@ body.advent-northern-lights-theme button:hover {
 }
 
 body.advent-northern-lights-theme .message {
-  background: rgba(10, 25, 45, 0.8);
+  background: rgba(10, 25, 45, 0.85);
   border-left: 3px solid rgba(0, 255, 136, 0.5);
 }
 
 body.advent-northern-lights-theme .shop-item {
-  background: rgba(10, 20, 40, 0.8);
+  background: rgba(10, 20, 40, 0.85);
   border: 2px solid rgba(0, 255, 136, 0.3);
   box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
 }
@@ -1641,8 +1598,6 @@ body.advent-holy-night-theme nav {
   backdrop-filter: blur(15px);
   border-bottom: 2px solid rgba(30, 58, 95, 0.7);
   box-shadow: 0 4px 20px rgba(10, 25, 48, 0.6);
-  position: relative;
-  z-index: 10;
 }
 
 body.advent-holy-night-theme nav a,
@@ -11695,6 +11650,478 @@ const MILLIONAIRE_QUESTIONS = [
     answers: ["Frosch", "Chamäleon", "Eidechse", "Schlange"],
     correct: 1
   },
+  
+  // Neue Fragen 151-250
+  {
+    question: "Wie viele Zehen hat eine Katze an den Vorderpfoten?",
+    answers: ["4", "5", "6", "8"],
+    correct: 1
+  },
+  {
+    question: "Welches ist das einzige Land, das aus einem ganzen Kontinent besteht?",
+    answers: ["Russland", "Australien", "Kanada", "Brasilien"],
+    correct: 1
+  },
+  {
+    question: "Was bedeutet 'www' in einer Internetadresse?",
+    answers: ["World Wide Web", "World Web Works", "Web World Wide", "Western Web World"],
+    correct: 0
+  },
+  {
+    question: "Wie heißt die Hauptstadt von Island?",
+    answers: ["Akureyri", "Reykjavik", "Kópavogur", "Hafnarfjörður"],
+    correct: 1
+  },
+  {
+    question: "Welcher Monat hat die wenigsten Tage?",
+    answers: ["Januar", "Februar", "November", "Dezember"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Neuseeland?",
+    answers: ["Auckland", "Wellington", "Christchurch", "Hamilton"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Knochen hat ein erwachsener Mensch?",
+    answers: ["186", "206", "226", "246"],
+    correct: 1
+  },
+  {
+    question: "Welcher Ozean ist der salzigste?",
+    answers: ["Pazifik", "Atlantik", "Indischer Ozean", "Rotes Meer"],
+    correct: 3
+  },
+  {
+    question: "Was ist das schwerste Organ im menschlichen Körper?",
+    answers: ["Gehirn", "Herz", "Leber", "Haut"],
+    correct: 3
+  },
+  {
+    question: "Wie heißt der höchste Berg in den Alpen?",
+    answers: ["Matterhorn", "Mont Blanc", "Eiger", "Zugspitze"],
+    correct: 1
+  },
+  {
+    question: "Welches Land hat die längste Küste der Welt?",
+    answers: ["Australien", "Russland", "Kanada", "USA"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Währung von Südkorea?",
+    answers: ["Yen", "Yuan", "Won", "Baht"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Augenlider hat ein Kamel?",
+    answers: ["2", "3", "4", "6"],
+    correct: 1
+  },
+  {
+    question: "Welcher Fluss ist der längste in Europa?",
+    answers: ["Donau", "Rhein", "Wolga", "Elbe"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Argentinien?",
+    answers: ["Córdoba", "Rosario", "Buenos Aires", "Mendoza"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man ein Tier, das nur Pflanzen frisst?",
+    answers: ["Karnivore", "Herbivore", "Omnivore", "Insektivore"],
+    correct: 1
+  },
+  {
+    question: "Welches Element hat das chemische Symbol 'Cu'?",
+    answers: ["Kobalt", "Kupfer", "Calcium", "Kohlenstoff"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Brasilien?",
+    answers: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Atemzüge macht ein Mensch pro Minute durchschnittlich?",
+    answers: ["8-12", "12-20", "20-30", "30-40"],
+    correct: 1
+  },
+  {
+    question: "Welcher Vogel kann nicht fliegen?",
+    answers: ["Papagei", "Adler", "Pinguin", "Kolibri"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Mexiko?",
+    answers: ["Guadalajara", "Monterrey", "Mexiko-Stadt", "Cancún"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt die größte Wüste Asiens?",
+    answers: ["Taklamakan", "Gobi", "Thar", "Karakum"],
+    correct: 1
+  },
+  {
+    question: "Welches Vitamin ist auch als Ascorbinsäure bekannt?",
+    answers: ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Chile?",
+    answers: ["Valparaíso", "Santiago", "Concepción", "Viña del Mar"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Herzen hat eine Krake?",
+    answers: ["1", "2", "3", "4"],
+    correct: 2
+  },
+  {
+    question: "Welcher Planet ist der Erde am nächsten?",
+    answers: ["Mars", "Venus", "Merkur", "Jupiter"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Ägypten?",
+    answers: ["Alexandria", "Kairo", "Gizeh", "Luxor"],
+    correct: 1
+  },
+  {
+    question: "Wie nennt man die Angst vor Höhe?",
+    answers: ["Agoraphobie", "Klaustrophobie", "Akrophobie", "Arachnophobie"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das kleinste Land der Welt?",
+    answers: ["Monaco", "Vatikanstadt", "San Marino", "Liechtenstein"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Thailand?",
+    answers: ["Phuket", "Chiang Mai", "Bangkok", "Pattaya"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Rippen hat ein Mensch normalerweise?",
+    answers: ["20", "22", "24", "26"],
+    correct: 2
+  },
+  {
+    question: "Welcher Berg ist der höchste außerhalb Asiens?",
+    answers: ["Mount McKinley", "Aconcagua", "Kilimandscharo", "Mont Blanc"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Südafrika (eine von drei)?",
+    answers: ["Johannesburg", "Pretoria", "Durban", "Port Elizabeth"],
+    correct: 1
+  },
+  {
+    question: "Wie heißt der größte Mond des Saturn?",
+    answers: ["Europa", "Titan", "Ganymed", "Io"],
+    correct: 1
+  },
+  {
+    question: "Welches Element hat das Symbol 'Pb'?",
+    answers: ["Platin", "Blei", "Palladium", "Phosphor"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Marokko?",
+    answers: ["Casablanca", "Marrakesch", "Rabat", "Fès"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Kammern hat der Magen einer Kuh?",
+    answers: ["1", "2", "3", "4"],
+    correct: 3
+  },
+  {
+    question: "Welcher Fluss fließt durch London?",
+    answers: ["Severn", "Themse", "Trent", "Mersey"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Peru?",
+    answers: ["Cusco", "Arequipa", "Lima", "Trujillo"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man ein Tier, das sowohl Pflanzen als auch Fleisch frisst?",
+    answers: ["Karnivore", "Herbivore", "Omnivore", "Insektivore"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das schnellste Tier im Wasser?",
+    answers: ["Delfin", "Hai", "Marlin", "Schwertfisch"],
+    correct: 3
+  },
+  {
+    question: "Was ist die Hauptstadt von Vietnam?",
+    answers: ["Ho-Chi-Minh-Stadt", "Hanoi", "Da Nang", "Hội An"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Zähne hat ein erwachsener Hund?",
+    answers: ["32", "36", "42", "48"],
+    correct: 2
+  },
+  {
+    question: "Welcher Planet hat die meisten Ringe?",
+    answers: ["Jupiter", "Saturn", "Uranus", "Neptun"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Kenia?",
+    answers: ["Mombasa", "Nairobi", "Kisumu", "Nakuru"],
+    correct: 1
+  },
+  {
+    question: "Wie heißt die Wissenschaft von den Pilzen?",
+    answers: ["Botanik", "Mykologie", "Zoologie", "Mikrobiologie"],
+    correct: 1
+  },
+  {
+    question: "Welches ist das giftigste Land-Tier?",
+    answers: ["Schwarze Mamba", "Pfeilgiftfrosch", "Skorpion", "Spinne"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Kolumbien?",
+    answers: ["Medellín", "Cali", "Bogotá", "Cartagena"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Beine hat eine Ameise?",
+    answers: ["4", "6", "8", "10"],
+    correct: 1
+  },
+  {
+    question: "Welcher Fluss ist der längste in Südamerika?",
+    answers: ["Orinoco", "Paraná", "Amazonas", "São Francisco"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Malaysia?",
+    answers: ["Penang", "Johor Bahru", "Kuala Lumpur", "Malakka"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man die Lehre von den Pflanzen?",
+    answers: ["Botanik", "Biologie", "Zoologie", "Geologie"],
+    correct: 0
+  },
+  {
+    question: "Welches Element hat das Symbol 'Hg'?",
+    answers: ["Helium", "Wasserstoff", "Quecksilber", "Hafnium"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Singapur?",
+    answers: ["Singapur", "Johor", "Malakka", "Kuala Lumpur"],
+    correct: 0
+  },
+  {
+    question: "Wie viele Lungen hat ein Mensch?",
+    answers: ["1", "2", "3", "4"],
+    correct: 1
+  },
+  {
+    question: "Welcher ist der größte Regenwald der Welt?",
+    answers: ["Kongo-Regenwald", "Amazonas-Regenwald", "Borneo-Regenwald", "Madagaskar"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Venezuela?",
+    answers: ["Maracaibo", "Valencia", "Caracas", "Barquisimeto"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt das größte Korallenriff der Welt?",
+    answers: ["Great Barrier Reef", "Belize Barrier Reef", "Florida Reef", "Rotes Meer Riff"],
+    correct: 0
+  },
+  {
+    question: "Welches Tier hat das stärkste Gift?",
+    answers: ["Kobra", "Taipan", "Seewespe", "Pfeilgiftfrosch"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Ecuador?",
+    answers: ["Guayaquil", "Cuenca", "Quito", "Manta"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Augen hat eine Biene?",
+    answers: ["2", "3", "5", "6"],
+    correct: 2
+  },
+  {
+    question: "Welcher ist der tiefste Punkt der Erde?",
+    answers: ["Puerto-Rico-Graben", "Java-Graben", "Marianengraben", "Tonga-Graben"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Philippinen?",
+    answers: ["Cebu", "Davao", "Manila", "Quezon City"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man ein Tier ohne Wirbelsäule?",
+    answers: ["Wirbellos", "Invertebrat", "Vertebrat", "Spineless"],
+    correct: 1
+  },
+  {
+    question: "Welches Land hat die meisten Zeitzonen?",
+    answers: ["USA", "Russland", "Kanada", "Frankreich"],
+    correct: 3
+  },
+  {
+    question: "Was ist die Hauptstadt von Pakistan?",
+    answers: ["Karachi", "Lahore", "Islamabad", "Faisalabad"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Monde hat der Mars?",
+    answers: ["0", "1", "2", "3"],
+    correct: 2
+  },
+  {
+    question: "Welcher Baum wird am ältesten?",
+    answers: ["Eiche", "Mammutbaum", "Borstenkiefer", "Baobab"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Bangladesch?",
+    answers: ["Chittagong", "Dhaka", "Khulna", "Sylhet"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Flügel hat eine Biene?",
+    answers: ["2", "4", "6", "8"],
+    correct: 1
+  },
+  {
+    question: "Welcher ist der größte Gletscher außerhalb der Polarregionen?",
+    answers: ["Aletschgletscher", "Fedtschenko-Gletscher", "Siachen-Gletscher", "Vatnajökull"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Uruguay?",
+    answers: ["Punta del Este", "Montevideo", "Salto", "Colonia"],
+    correct: 1
+  },
+  {
+    question: "Wie nennt man die Lehre von den Insekten?",
+    answers: ["Entomologie", "Arachnologie", "Herpetologie", "Ornithologie"],
+    correct: 0
+  },
+  {
+    question: "Welches Tier hat die längste Lebensdauer?",
+    answers: ["Grönlandwal", "Riesenschildkröte", "Grönlandhai", "Elefant"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Myanmar?",
+    answers: ["Rangun", "Naypyidaw", "Mandalay", "Bagan"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Herzen hat ein Tintenfisch?",
+    answers: ["1", "2", "3", "4"],
+    correct: 2
+  },
+  {
+    question: "Welcher ist der kälteste bewohnte Ort der Erde?",
+    answers: ["Jakutsk", "Oimjakon", "Werchojansk", "Norilsk"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Kambodscha?",
+    answers: ["Siem Reap", "Phnom Penh", "Battambang", "Sihanoukville"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Gehirnhälften hat ein Mensch?",
+    answers: ["1", "2", "3", "4"],
+    correct: 1
+  },
+  {
+    question: "Welches ist das lauteste Tier der Welt?",
+    answers: ["Löwe", "Elefant", "Blauwal", "Brüllaffe"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Bolivien?",
+    answers: ["La Paz", "Sucre", "Santa Cruz", "Cochabamba"],
+    correct: 1
+  },
+  {
+    question: "Wie nennt man Tiere, die nachts aktiv sind?",
+    answers: ["Diurnal", "Nokturnal", "Krepuskular", "Kathemeral"],
+    correct: 1
+  },
+  {
+    question: "Welcher Fluss fließt durch Ägypten?",
+    answers: ["Euphrat", "Tigris", "Nil", "Jordan"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Laos?",
+    answers: ["Luang Prabang", "Vientiane", "Pakse", "Savannakhet"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Beine hat eine Spinne?",
+    answers: ["6", "8", "10", "12"],
+    correct: 1
+  },
+  {
+    question: "Welches ist das größte Lebewesen der Welt?",
+    answers: ["Blauwal", "Riesenmammutbaum", "Hallimasch", "Elefant"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Nepal?",
+    answers: ["Pokhara", "Kathmandu", "Lalitpur", "Biratnagar"],
+    correct: 1
+  },
+  {
+    question: "Wie heißt die größte Bucht der Welt?",
+    answers: ["Golf von Mexiko", "Bucht von Bengalen", "Hudsonbai", "Große Australische Bucht"],
+    correct: 1
+  },
+  {
+    question: "Welches Element hat das Symbol 'Sn'?",
+    answers: ["Silber", "Zinn", "Natrium", "Schwefel"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Sri Lanka?",
+    answers: ["Colombo", "Sri Jayawardenepura Kotte", "Kandy", "Galle"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Wirbel hat ein menschlicher Rücken?",
+    answers: ["24", "33", "42", "50"],
+    correct: 1
+  },
+  {
+    question: "Welcher ist der höchste aktive Vulkan?",
+    answers: ["Vesuv", "Ätna", "Ojos del Salado", "Kilimandscharo"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Afghanistan?",
+    answers: ["Herat", "Kandahar", "Kabul", "Masar-e Scharif"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man die Lehre von den Vögeln?",
+    answers: ["Ornithologie", "Entomologie", "Ichthyologie", "Herpetologie"],
+    correct: 1
+  },
   {
     question: "Was ist die Hauptstadt von Rumänien?",
     answers: ["Budapest", "Sofia", "Bukarest", "Belgrad"],
@@ -11739,6 +12166,478 @@ const MILLIONAIRE_QUESTIONS = [
     question: "Welche Stadt ist auch als 'Big Apple' bekannt?",
     answers: ["Los Angeles", "Chicago", "New York", "Boston"],
     correct: 2
+  },
+  
+  // Neue Fragen 251-350
+  {
+    question: "Wie viele Sekunden hat eine Stunde?",
+    answers: ["1800", "3600", "7200", "10800"],
+    correct: 1
+  },
+  {
+    question: "Welcher Vogel legt die größten Eier?",
+    answers: ["Strauß", "Emu", "Albatros", "Kondor"],
+    correct: 0
+  },
+  {
+    question: "Was ist die Hauptstadt von Jordanien?",
+    answers: ["Aqaba", "Petra", "Amman", "Irbid"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man einen weiblichen Fuchs?",
+    answers: ["Füchsin", "Fuchsdame", "Fähe", "Foxine"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das größte Land in Afrika?",
+    answers: ["Sudan", "Libyen", "Algerien", "Kongo"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Libanon?",
+    answers: ["Tripoli", "Sidon", "Beirut", "Tyrus"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Rippen hat eine Giraffe?",
+    answers: ["14", "16", "18", "20"],
+    correct: 0
+  },
+  {
+    question: "Welcher Planet dreht sich rückwärts?",
+    answers: ["Merkur", "Venus", "Mars", "Uranus"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Tunesien?",
+    answers: ["Sfax", "Sousse", "Tunis", "Kairouan"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt der größte Diamant der Welt?",
+    answers: ["Hope", "Regent", "Cullinan", "Koh-i-Noor"],
+    correct: 2
+  },
+  {
+    question: "Welches Tier hat die längste Zunge?",
+    answers: ["Giraffe", "Chamäleon", "Ameisenbär", "Kolibri"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Kuba?",
+    answers: ["Santiago", "Havanna", "Guantánamo", "Holguín"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Millimeter sind ein Zentimeter?",
+    answers: ["5", "10", "50", "100"],
+    correct: 1
+  },
+  {
+    question: "Welcher Berg ist der höchste in Nordamerika?",
+    answers: ["Mount Logan", "Denali", "Mount Whitney", "Mount Rainier"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Algerien?",
+    answers: ["Oran", "Constantine", "Algier", "Annaba"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man die Angst vor Wasser?",
+    answers: ["Hydrophobie", "Aquaphobie", "Thalassophobie", "Beide A+B"],
+    correct: 3
+  },
+  {
+    question: "Welches ist das häufigste Gas in der Luft?",
+    answers: ["Sauerstoff", "Stickstoff", "Kohlendioxid", "Argon"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Äthiopien?",
+    answers: ["Nairobi", "Kampala", "Addis Abeba", "Asmara"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Tentakel hat ein Tintenfisch?",
+    answers: ["6", "8", "10", "12"],
+    correct: 1
+  },
+  {
+    question: "Welcher Fluss ist der längste in Deutschland?",
+    answers: ["Elbe", "Rhein", "Donau", "Main"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Ghana?",
+    answers: ["Lagos", "Abuja", "Accra", "Kumasi"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt das größte Raubtier an Land?",
+    answers: ["Sibirischer Tiger", "Löwe", "Eisbär", "Braunbär"],
+    correct: 2
+  },
+  {
+    question: "Welches Element hat das Symbol 'K'?",
+    answers: ["Kobalt", "Kalium", "Kadmium", "Krypton"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Senegal?",
+    answers: ["Abidjan", "Bamako", "Dakar", "Conakry"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Quadrate sind auf einem Schachbrett?",
+    answers: ["64", "81", "100", "204"],
+    correct: 3
+  },
+  {
+    question: "Welcher Ozean ist der kleinste?",
+    answers: ["Indischer Ozean", "Arktischer Ozean", "Atlantik", "Südlicher Ozean"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Tansania?",
+    answers: ["Daressalam", "Dodoma", "Arusha", "Mwanza"],
+    correct: 1
+  },
+  {
+    question: "Wie nennt man ein Tier, das Eier legt?",
+    answers: ["Ovipar", "Vivipar", "Ovovivipar", "Placentar"],
+    correct: 0
+  },
+  {
+    question: "Welcher Planet hat den kürzesten Tag?",
+    answers: ["Merkur", "Venus", "Jupiter", "Saturn"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Uganda?",
+    answers: ["Nairobi", "Dodoma", "Kampala", "Kigali"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Zähne hat ein Elefant zum Kauen?",
+    answers: ["2", "4", "8", "32"],
+    correct: 1
+  },
+  {
+    question: "Welches ist das giftigste Element?",
+    answers: ["Arsen", "Plutonium", "Polonium", "Quecksilber"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Sambia?",
+    answers: ["Harare", "Lusaka", "Lilongwe", "Gaborone"],
+    correct: 1
+  },
+  {
+    question: "Wie heißt die größte Spinnenart?",
+    answers: ["Vogelspinne", "Goliath-Vogelspinne", "Schwarze Witwe", "Bananenspinne"],
+    correct: 1
+  },
+  {
+    question: "Welcher Berg ist der höchste in Europa?",
+    answers: ["Mont Blanc", "Matterhorn", "Elbrus", "Monte Rosa"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Simbabwe?",
+    answers: ["Bulawayo", "Harare", "Mutare", "Gweru"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Mägen hat ein Pferd?",
+    answers: ["1", "2", "3", "4"],
+    correct: 0
+  },
+  {
+    question: "Welches ist das seltenste Blutgruppe?",
+    answers: ["A-", "B-", "AB-", "0-"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Mosambik?",
+    answers: ["Beira", "Nampula", "Maputo", "Quelimane"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man die Wissenschaft von den Fischen?",
+    answers: ["Ichthyologie", "Herpetologie", "Ornithologie", "Mammalogie"],
+    correct: 0
+  },
+  {
+    question: "Welcher Kontinent hat keine Wüsten?",
+    answers: ["Europa", "Australien", "Südamerika", "Keine Antwort"],
+    correct: 0
+  },
+  {
+    question: "Was ist die Hauptstadt von Namibia?",
+    answers: ["Swakopmund", "Walvis Bay", "Windhoek", "Oshakati"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Fußballfelder passen in einen Quadratkilometer?",
+    answers: ["100", "140", "200", "250"],
+    correct: 1
+  },
+  {
+    question: "Welches Tier hat das beste Gedächtnis?",
+    answers: ["Delfin", "Elefant", "Rabe", "Schimpanse"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Botswana?",
+    answers: ["Francistown", "Maun", "Gaborone", "Kasane"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt der größte Stern im Universum?",
+    answers: ["Beteigeuze", "VY Canis Majoris", "UY Scuti", "Antares"],
+    correct: 2
+  },
+  {
+    question: "Welcher Fluss fließt durch Rom?",
+    answers: ["Po", "Arno", "Tiber", "Adda"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Angola?",
+    answers: ["Benguela", "Huambo", "Luanda", "Lobito"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Flossen hat ein typischer Fisch?",
+    answers: ["3", "5", "7", "9"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das längste Buch der Bibel nach Kapiteln?",
+    answers: ["Genesis", "Psalmen", "Jesaja", "Jeremia"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Madagaskar?",
+    answers: ["Toamasina", "Antsirabe", "Antananarivo", "Mahajanga"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man Tiere, die Aas fressen?",
+    answers: ["Karnivoren", "Aasfresser", "Saprophagen", "Detritivoren"],
+    correct: 1
+  },
+  {
+    question: "Welcher Planet hat die stärksten Winde?",
+    answers: ["Jupiter", "Saturn", "Uranus", "Neptun"],
+    correct: 3
+  },
+  {
+    question: "Was ist die Hauptstadt von Mauretanien?",
+    answers: ["Nouadhibou", "Nouakchott", "Kaédi", "Zouerate"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Beine hat ein Tausendfüßler wirklich?",
+    answers: ["100", "750", "Bis zu 750", "Genau 1000"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das schnellste Tier an Land über kurze Distanz?",
+    answers: ["Gepard", "Springbock", "Löwe", "Windhund"],
+    correct: 0
+  },
+  {
+    question: "Was ist die Hauptstadt von Niger?",
+    answers: ["Agadez", "Zinder", "Niamey", "Maradi"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt die größte Schlange der Welt?",
+    answers: ["Anakonda", "Python", "Königskobra", "Boa"],
+    correct: 0
+  },
+  {
+    question: "Welcher Fluss fließt durch Budapest?",
+    answers: ["Dnjepr", "Donau", "Weichsel", "Oder"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Mali?",
+    answers: ["Timbuktu", "Gao", "Bamako", "Sikasso"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Knochen hat eine Schlange?",
+    answers: ["0", "50-100", "200-400", "500-600"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das tiefste Meer?",
+    answers: ["Philippinensee", "Korallensee", "Arabisches Meer", "Karibik"],
+    correct: 0
+  },
+  {
+    question: "Was ist die Hauptstadt von Tschad?",
+    answers: ["Moundou", "Sarh", "N'Djamena", "Abéché"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man die Lehre von den Reptilien?",
+    answers: ["Herpetologie", "Ichthyologie", "Ornithologie", "Mammalogie"],
+    correct: 0
+  },
+  {
+    question: "Welcher Planet hat die meisten Vulkane?",
+    answers: ["Erde", "Mars", "Venus", "Io (Mond)"],
+    correct: 3
+  },
+  {
+    question: "Was ist die Hauptstadt von Burkina Faso?",
+    answers: ["Bobo-Dioulasso", "Koudougou", "Ouagadougou", "Banfora"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Augen hat eine Libelle?",
+    answers: ["2", "5", "Tausende", "Zehntausende"],
+    correct: 3
+  },
+  {
+    question: "Welches ist das älteste noch existierende Land?",
+    answers: ["Ägypten", "China", "Iran", "San Marino"],
+    correct: 3
+  },
+  {
+    question: "Was ist die Hauptstadt von Benin?",
+    answers: ["Cotonou", "Porto-Novo", "Parakou", "Abomey"],
+    correct: 1
+  },
+  {
+    question: "Wie heißt das größte Nagetier der Welt?",
+    answers: ["Biber", "Capybara", "Stachelschwein", "Paka"],
+    correct: 1
+  },
+  {
+    question: "Welcher Fluss ist der wasserreichste?",
+    answers: ["Amazonas", "Kongo", "Ganges", "Mississippi"],
+    correct: 0
+  },
+  {
+    question: "Was ist die Hauptstadt von Elfenbeinküste?",
+    answers: ["Abidjan", "Yamoussoukro", "Bouaké", "Daloa"],
+    correct: 1
+  },
+  {
+    question: "Wie viele Herzen hat ein Regenwurm?",
+    answers: ["1", "3", "5", "10"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das häufigste Metall in der Erdkruste?",
+    answers: ["Eisen", "Aluminium", "Kupfer", "Gold"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Liberia?",
+    answers: ["Gbarnga", "Buchanan", "Monrovia", "Harper"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man ein Tier, das nur Fleisch frisst?",
+    answers: ["Karnivore", "Herbivore", "Omnivore", "Insektivore"],
+    correct: 0
+  },
+  {
+    question: "Welcher Planet ist am heißesten?",
+    answers: ["Merkur", "Venus", "Mars", "Jupiter"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Sierra Leone?",
+    answers: ["Bo", "Kenema", "Freetown", "Makeni"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Füße hat ein Tintenfisch?",
+    answers: ["0", "2", "8", "10"],
+    correct: 0
+  },
+  {
+    question: "Welches ist das einzige Säugetier, das Eier legt?",
+    answers: ["Ameisenigel", "Schnabeltier", "Beide", "Keines"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Guinea?",
+    answers: ["Kankan", "Nzérékoré", "Conakry", "Kindia"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt der größte Vogel der Welt?",
+    answers: ["Kondor", "Albatros", "Strauß", "Emu"],
+    correct: 2
+  },
+  {
+    question: "Welcher Fluss fließt durch Prag?",
+    answers: ["Elbe", "Moldau", "Oder", "Donau"],
+    correct: 1
+  },
+  {
+    question: "Was ist die Hauptstadt von Gambia?",
+    answers: ["Serekunda", "Brikama", "Banjul", "Bakau"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Zähne hat ein Krokodil?",
+    answers: ["30-40", "50-60", "60-80", "80-100"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das kleinste Säugetier der Welt?",
+    answers: ["Zwergspitzmaus", "Etruskerspitzmaus", "Hummelfledermaus", "Zwergmaus"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Eritrea?",
+    answers: ["Massawa", "Keren", "Asmara", "Assab"],
+    correct: 2
+  },
+  {
+    question: "Wie nennt man die Wissenschaft vom Wetter?",
+    answers: ["Klimatologie", "Meteorologie", "Atmosphärologie", "Wetterologie"],
+    correct: 1
+  },
+  {
+    question: "Welcher Planet rotiert auf der Seite?",
+    answers: ["Merkur", "Venus", "Uranus", "Neptun"],
+    correct: 2
+  },
+  {
+    question: "Was ist die Hauptstadt von Dschibuti?",
+    answers: ["Ali Sabieh", "Tadjoura", "Dschibuti", "Obock"],
+    correct: 2
+  },
+  {
+    question: "Wie viele Tentakel hat eine Qualle normalerweise?",
+    answers: ["4", "8", "Variiert", "Unendlich"],
+    correct: 2
+  },
+  {
+    question: "Welches ist das größte Riff der Welt?",
+    answers: ["Great Barrier Reef", "Belize Barrier Reef", "Rotes Meer Riff", "Neukaledonisches Riff"],
+    correct: 0
+  },
+  {
+    question: "Was ist die Hauptstadt von Somalia?",
+    answers: ["Hargeisa", "Berbera", "Mogadischu", "Kismayo"],
+    correct: 2
+  },
+  {
+    question: "Wie heißt das größte Raubtier im Meer?",
+    answers: ["Weißer Hai", "Orca", "Riesenkalmar", "Pottwal"],
+    correct: 3
   }
   ,
   // Frage 201-300 (Neue Fragen – Gemischt)
@@ -11851,6 +12750,7 @@ let millionaireGameActive = false;
 let millionaireJoker5050Used = false;
 let millionaireJokerAudienceUsed = false;
 let millionaireShuffledQuestions = [];
+let millionaireAnswerCooldown = false;
 
 // Spiel starten - wähle 15 zufällige Fragen mit steigender Schwierigkeit
 window.startMillionaire = function() {
@@ -11946,7 +12846,19 @@ function showMillionaireQuestion() {
 
 // Antwort prüfen
 async function checkMillionaireAnswer(selected) {
-  if (!millionaireGameActive) return;
+  if (!millionaireGameActive || millionaireAnswerCooldown) return;
+  
+  // Cooldown aktivieren
+  millionaireAnswerCooldown = true;
+  
+  // Alle Buttons deaktivieren
+  for (let i = 0; i < 4; i++) {
+    const button = document.getElementById(`millionaire-answer-${i}`);
+    if (button) {
+      button.style.pointerEvents = "none";
+      button.style.opacity = "0.7";
+    }
+  }
   
   const q = millionaireShuffledQuestions[millionaireCurrentQuestion];
   const btn = document.getElementById(`millionaire-answer-${selected}`);
@@ -11956,9 +12868,10 @@ async function checkMillionaireAnswer(selected) {
     btn.style.background = "#4CAF50";
     btn.style.border = "2px solid #00ff00";
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     millionaireCurrentQuestion++;
+    millionaireAnswerCooldown = false;
     showMillionaireQuestion();
     
   } else {
@@ -11974,6 +12887,8 @@ async function checkMillionaireAnswer(selected) {
     millionaireGameActive = false;
     
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    millionaireAnswerCooldown = false;
     
     // Spiel verloren – immer 0 Münzen bei falscher Antwort
     millionaireCurrentWinnings = 0; // sicherstellen
