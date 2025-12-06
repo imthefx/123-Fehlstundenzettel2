@@ -2614,15 +2614,24 @@ window.addEventListener('resize', fillNumberLayers);
       var token = getFDToken();
       if (!token) { resolve(null); return; }
       var code = LEAGUE_CODES[leagueKey] || 'PL';
-      var url = 'https://one23-fehlstundenzettel2.onrender.com/api/football/' + code;
-      fetch(url)
+      var url = 'https://one23-fehlstundenzettel2.onrender.com/api/football/' + code + '?token=' + encodeURIComponent(token);
+      fetch(url, { headers: { 'X-Auth-Token': token } })
         .then(function(res){ if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
         .then(function(data){
           var matches = Array.isArray(data.matches) ? data.matches : [];
           if (!matches.length) { resolve(null); return; }
-          matches.sort(function(a,b){ return new Date(a.utcDate) - new Date(b.utcDate); });
-          var nextRound = (matches[0] && matches[0].matchday) ? matches[0].matchday : null;
-          var roundMatches = matches.filter(function(m){ return m.matchday === nextRound; });
+          // Nur kommende Spiele berücksichtigen (SCHEDULED/TIMED)
+          var scheduled = matches.filter(function(m){
+            return m && ['SCHEDULED','TIMED'].includes(m.status || '') && m.matchday != null;
+          });
+          // Fallback: falls nichts geplant, nimm alles
+          var pool = scheduled.length ? scheduled : matches;
+          pool.sort(function(a,b){ return new Date(a.utcDate) - new Date(b.utcDate); });
+          var now = Date.now();
+          var future = pool.filter(function(m){ return new Date(m.utcDate).getTime() > now; });
+          // Bestimme den Matchday des nächsten anstehenden Spiels
+          var nextRound = future.length ? future[0].matchday : (pool[pool.length-1] && pool[pool.length-1].matchday);
+          var roundMatches = pool.filter(function(m){ return m.matchday === nextRound; });
           var fixtures = roundMatches.map(function(m){
             return { id: m.id,
                      home: (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : 'Heim',
@@ -2656,34 +2665,21 @@ window.addEventListener('resize', fillNumberLayers);
         if (token && infoEl) { infoEl.textContent = 'Live-Plan nicht verfügbar – zeige Fallback-Spieltag.'; }
         return;
       }
-      fixturesList.innerHTML = '';
-      infoEl.textContent = dataset.matchday;
-      // Map live fixtures for global lookup by placeBet
       try {
         window.__liveFixtures = window.__liveFixtures || {};
         window.__liveFixtures[leagueKey] = {};
+        dataset.fixtures.forEach(function(fx){
+          window.__liveFixtures[leagueKey][String(fx.id)] = {
+            id: fx.id,
+            home: fx.home,
+            away: fx.away,
+            kickoff: fx.kickoff,
+            matchday: dataset.matchday || null
+          };
+        });
       } catch(_) {}
-      var now = Date.now();
-      dataset.fixtures.forEach(function(fx){
-        var locked = fx.kickoff <= now;
-        try { if (window.__liveFixtures) { window.__liveFixtures[leagueKey][String(fx.id)] = { id: fx.id, home: fx.home, away: fx.away, kickoff: fx.kickoff }; } } catch(_) {}
-        var row = document.createElement('div');
-        row.className = 'fixture-row';
-        row.innerHTML =
-          '<div><strong>' + fx.home + '</strong> vs <strong>' + fx.away + '</strong></div>' +
-          '<div>Kickoff: ' + new Date(fx.kickoff).toLocaleString() + '</div>' +
-          '<div>' +
-            'Einsatz: <input type="number" id="stake_' + fx.id + '" min="5" max="100" value="5" ' + (locked? 'disabled':'') + ' />' +
-            ' Ergebnis: ' +
-              '<input type="number" id="home_' + fx.id + '" min="0" value="0" style="width:50px" ' + (locked? 'disabled':'') + ' /> :' +
-              '<input type="number" id="away_' + fx.id + '" min="0" value="0" style="width:50px" ' + (locked? 'disabled':'') + ' />' +
-            ' <button ' + (locked? 'disabled':'') + ' id="betbtn_' + fx.id + '" onclick="window.placeBet && window.placeBet(\'' + leagueKey + '\',\'' + fx.id + '\')">Wetten</button>' +
-            (locked? '<span style="color:#b00;margin-left:8px;">Gesperrt nach Spielstart</span>':'' ) +
-          '</div>';
-        fixturesList.appendChild(row);
-        var btn = row.querySelector('#betbtn_' + fx.id);
-        if (btn && !locked){ btn.addEventListener('click', function(){ if (window.placeBet) window.placeBet(leagueKey, fx.id); }); }
-      });
+      // Render mit dem neuen Renderer inkl. gespeicherten Wetten
+      renderMatchdayFixtures(leagueKey, dataset.fixtures, dataset.matchday || `Live Spieltag (${leagueKey})`);
     });
   }
 
@@ -2724,18 +2720,16 @@ window.addEventListener('resize', fillNumberLayers);
 <script type="module">
 // Minimal Firebase imports to work independently of existing module
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, query, where, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, query, where, serverTimestamp, increment, collectionGroup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Use auth/db lazily to avoid race with main Firebase init
 let __matchdayAuth = null;
 try { __matchdayAuth = getAuth(); } catch(e) { /* initialized later; fall back to window.auth in getter */ }
-let __matchdayDb = null;
+
 function __getDb(){
-  if (__matchdayDb) return __matchdayDb;
   // Prefer main app's db if already created
-  if (window.db) { __matchdayDb = window.db; return __matchdayDb; }
-  try { __matchdayDb = getFirestore(); } catch(e) { /* will retry on first use */ }
-  return __matchdayDb;
+  if (window.db) return window.db;
+  try { return getFirestore(); } catch(e) { return null; }
 }
 
 // Helper: get current user
@@ -2750,36 +2744,88 @@ function getCurrentUid() {
 async function addCoinsSimple(amount) {
   const uid = getCurrentUid();
   if (!uid) throw new Error('no-user');
-  const userRef = doc(__getDb(), 'users', uid);
+  const db = __getDb();
+  if (!db) throw new Error('db-not-ready');
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, { coins: increment(amount) });
+}
+
+// Add coins to a specific user (used by admin settlement)
+async function addCoinsTo(uid, amount) {
+  if (!uid) return;
+  const db = __getDb();
+  if (!db) throw new Error('db-not-ready');
+  const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, { coins: increment(amount) });
 }
 
 // MATCHDAY TIPS ⚽ – Fixtures anzeigen + Wetten (Auszahlung Donnerstag)
 const MATCHDAY_FIXTURES = {
   EPL: [
-    { id: 'epl-1', home: 'Arsenal', away: 'Chelsea', kickoff: Date.now() + 86400000 },
-    { id: 'epl-2', home: 'Liverpool', away: 'Manchester City', kickoff: Date.now() + 90000000 }
+    { id: 'epl-1', home: 'Arsenal', away: 'Chelsea', kickoff: Date.now() + 3600_000 * 24 },
+    { id: 'epl-2', home: 'Liverpool', away: 'Manchester City', kickoff: Date.now() + 3600_000 * 26 },
+    { id: 'epl-3', home: 'Manchester United', away: 'Tottenham', kickoff: Date.now() + 3600_000 * 28 },
+    { id: 'epl-4', home: 'Newcastle United', away: 'Aston Villa', kickoff: Date.now() + 3600_000 * 30 },
+    { id: 'epl-5', home: 'Brighton', away: 'West Ham', kickoff: Date.now() + 3600_000 * 32 },
+    { id: 'epl-6', home: 'Brentford', away: 'Crystal Palace', kickoff: Date.now() + 3600_000 * 34 },
+    { id: 'epl-7', home: 'Everton', away: 'Wolves', kickoff: Date.now() + 3600_000 * 36 },
+    { id: 'epl-8', home: 'Nottingham Forest', away: 'Fulham', kickoff: Date.now() + 3600_000 * 38 },
+    { id: 'epl-9', home: 'Bournemouth', away: 'Burnley', kickoff: Date.now() + 3600_000 * 40 },
+    { id: 'epl-10', home: 'Sheffield United', away: 'Luton Town', kickoff: Date.now() + 3600_000 * 42 }
   ],
   LL: [
-    { id: 'll-1', home: 'FC Barcelona', away: 'Real Madrid', kickoff: Date.now() + 88000000 }
+    { id: 'll-1', home: 'FC Barcelona', away: 'Real Madrid', kickoff: Date.now() + 3600_000 * 24 },
+    { id: 'll-2', home: 'Atletico Madrid', away: 'Sevilla', kickoff: Date.now() + 3600_000 * 26 },
+    { id: 'll-3', home: 'Valencia', away: 'Villarreal', kickoff: Date.now() + 3600_000 * 28 },
+    { id: 'll-4', home: 'Real Sociedad', away: 'Athletic Bilbao', kickoff: Date.now() + 3600_000 * 30 },
+    { id: 'll-5', home: 'Real Betis', away: 'Celta Vigo', kickoff: Date.now() + 3600_000 * 32 },
+    { id: 'll-6', home: 'Osasuna', away: 'Girona', kickoff: Date.now() + 3600_000 * 34 },
+    { id: 'll-7', home: 'Mallorca', away: 'Alaves', kickoff: Date.now() + 3600_000 * 36 },
+    { id: 'll-8', home: 'Las Palmas', away: 'Granada', kickoff: Date.now() + 3600_000 * 38 },
+    { id: 'll-9', home: 'Getafe', away: 'Cadiz', kickoff: Date.now() + 3600_000 * 40 },
+    { id: 'll-10', home: 'Rayo Vallecano', away: 'Espanyol', kickoff: Date.now() + 3600_000 * 42 }
   ],
   BL: [
-    { id: 'bl-1', home: 'Bayern München', away: 'Borussia Dortmund', kickoff: Date.now() + 91000000 }
+    { id: 'bl-1', home: 'Bayern München', away: 'Borussia Dortmund', kickoff: Date.now() + 3600_000 * 24 },
+    { id: 'bl-2', home: 'RB Leipzig', away: 'Bayer Leverkusen', kickoff: Date.now() + 3600_000 * 26 },
+    { id: 'bl-3', home: 'Eintracht Frankfurt', away: 'VfB Stuttgart', kickoff: Date.now() + 3600_000 * 28 },
+    { id: 'bl-4', home: 'Borussia Mönchengladbach', away: 'SC Freiburg', kickoff: Date.now() + 3600_000 * 30 },
+    { id: 'bl-5', home: 'Werder Bremen', away: '1. FC Köln', kickoff: Date.now() + 3600_000 * 32 },
+    { id: 'bl-6', home: 'TSG Hoffenheim', away: 'VfL Wolfsburg', kickoff: Date.now() + 3600_000 * 34 },
+    { id: 'bl-7', home: 'Union Berlin', away: 'Mainz 05', kickoff: Date.now() + 3600_000 * 36 },
+    { id: 'bl-8', home: 'Augsburg', away: 'Heidenheim', kickoff: Date.now() + 3600_000 * 38 },
+    { id: 'bl-9', home: 'Bochum', away: 'Darmstadt', kickoff: Date.now() + 3600_000 * 40 },
+    { id: 'bl-10', home: 'St. Pauli', away: 'Kaiserslautern', kickoff: Date.now() + 3600_000 * 42 }
   ],
   SA: [
-    { id: 'sa-1', home: 'AC Mailand', away: 'Inter Mailand', kickoff: Date.now() + 93000000 }
+    { id: 'sa-1', home: 'AC Mailand', away: 'Inter Mailand', kickoff: Date.now() + 3600_000 * 24 },
+    { id: 'sa-2', home: 'Juventus', away: 'Napoli', kickoff: Date.now() + 3600_000 * 26 },
+    { id: 'sa-3', home: 'AS Rom', away: 'Lazio', kickoff: Date.now() + 3600_000 * 28 },
+    { id: 'sa-4', home: 'Atalanta', away: 'Fiorentina', kickoff: Date.now() + 3600_000 * 30 },
+    { id: 'sa-5', home: 'Bologna', away: 'Torino', kickoff: Date.now() + 3600_000 * 32 },
+    { id: 'sa-6', home: 'Udinese', away: 'Sassuolo', kickoff: Date.now() + 3600_000 * 34 },
+    { id: 'sa-7', home: 'Genoa', away: 'Sampdoria', kickoff: Date.now() + 3600_000 * 36 },
+    { id: 'sa-8', home: 'Monza', away: 'Empoli', kickoff: Date.now() + 3600_000 * 38 },
+    { id: 'sa-9', home: 'Lecce', away: 'Cagliari', kickoff: Date.now() + 3600_000 * 40 },
+    { id: 'sa-10', home: 'Verona', away: 'Salernitana', kickoff: Date.now() + 3600_000 * 42 }
   ],
   L1: [
-    { id: 'l1-1', home: 'Paris Saint-Germain', away: 'Olympique Lyon', kickoff: Date.now() + 95000000 }
+    { id: 'l1-1', home: 'Paris Saint-Germain', away: 'Olympique Lyon', kickoff: Date.now() + 3600_000 * 24 },
+    { id: 'l1-2', home: 'Olympique Marseille', away: 'AS Monaco', kickoff: Date.now() + 3600_000 * 26 },
+    { id: 'l1-3', home: 'Lille OSC', away: 'Stade Rennais', kickoff: Date.now() + 3600_000 * 28 },
+    { id: 'l1-4', home: 'OGC Nizza', away: 'RC Lens', kickoff: Date.now() + 3600_000 * 30 },
+    { id: 'l1-5', home: 'Nantes', away: 'Reims', kickoff: Date.now() + 3600_000 * 32 },
+    { id: 'l1-6', home: 'Montpellier', away: 'Toulouse', kickoff: Date.now() + 3600_000 * 34 },
+    { id: 'l1-7', home: 'Strasbourg', away: 'Brest', kickoff: Date.now() + 3600_000 * 36 },
+    { id: 'l1-8', home: 'Clermont Foot', away: 'Metz', kickoff: Date.now() + 3600_000 * 38 },
+    { id: 'l1-9', home: 'Le Havre', away: 'Lorient', kickoff: Date.now() + 3600_000 * 40 },
+    { id: 'l1-10', home: 'Angers', away: 'Auxerre', kickoff: Date.now() + 3600_000 * 42 }
   ]
 };
 
-async function loadMatchday() {
-  const leagueEl = document.getElementById('leagueSelect');
-  const league = leagueEl ? leagueEl.value : 'EPL';
-  const fixtures = MATCHDAY_FIXTURES[league] || [];
+async function renderMatchdayFixtures(league, fixtures, labelText) {
   const uid = getCurrentUid();
-  
+
   // Load existing bets for this user and league
   let userBets = {};
   if (uid) {
@@ -2795,13 +2841,17 @@ async function loadMatchday() {
       console.error('Error loading bets:', e);
     }
   }
+
   const list = document.getElementById('fixturesList');
   const info = document.getElementById('matchdayInfo');
 
-  if (info) info.textContent = `Spiele: ${fixtures.length}. Wetten gesperrt nach Anpfiff. Auszahlung: Donnerstag.`;
+  if (info) {
+    const gamesLabel = labelText || `Spiele: ${fixtures.length}`;
+    info.textContent = `${gamesLabel}. Wetten gesperrt nach Anpfiff. Auszahlung: Donnerstag.`;
+  }
 
   if (!list) return;
-  if (fixtures.length === 0) {
+  if (!fixtures || fixtures.length === 0) {
     list.innerHTML = '<p style="opacity:0.7;">Keine Spiele</p>';
     return;
   }
@@ -2908,17 +2958,119 @@ async function loadMatchday() {
   } catch(e) { console.error('delegate bind failed', e); }
 }
 
+async function loadMatchday() {
+  const leagueEl = document.getElementById('leagueSelect');
+  const league = leagueEl ? leagueEl.value : 'EPL';
+  
+  console.log('[loadMatchday] START - league:', league);
+  
+  // Token immer versuchen
+  const token = localStorage.getItem('footballDataToken') || '42525aa12c0d4f478c1627432b66b0d0';
+  const leagueMapLocal = { EPL:'PL', LL:'PD', BL:'BL1', SA:'SA', L1:'FL1' };
+  const comp = leagueMapLocal[league];
+  
+  console.log('[loadMatchday] Token:', token.substring(0, 10) + '...', 'Comp:', comp);
+  
+  if (token && comp) {
+    try {
+      const url = `https://one23-fehlstundenzettel2.onrender.com/api/football/${comp}`;
+      console.log('[loadMatchday] API URL:', url);
+      
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      
+      const res = await fetch(url, { 
+        headers: { 'X-Auth-Token': token },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeout);
+      console.log('[loadMatchday] HTTP Status:', res.status);
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log('[loadMatchday] Full API Response:', data);
+        
+        const matches = data.matches || [];
+        console.log('[loadMatchday] Matches array length:', matches.length);
+        
+        if (matches.length > 0) {
+          // Zeige erste 3 Matches als Debug
+          console.log('[loadMatchday] First 3 matches:', matches.slice(0, 3));
+          
+          // Gruppiere nach Matchday
+          const byMatchday = new Map();
+          matches.forEach(m => {
+            const md = m.matchday !== undefined ? m.matchday : (m.season?.currentMatchday ?? 0);
+            console.log('[loadMatchday] Match ID:', m.id, 'Matchday:', md, 'Status:', m.status);
+            if (!byMatchday.has(md)) byMatchday.set(md, []);
+            byMatchday.get(md).push(m);
+          });
+          
+          const mds = Array.from(byMatchday.keys()).filter(n => typeof n === 'number').sort((a, b) => a - b);
+          console.log('[loadMatchday] All matchdays found:', mds);
+          
+          const targetMd = mds.length > 0 ? mds[0] : null;
+          console.log('[loadMatchday] Using matchday:', targetMd);
+          
+          if (targetMd !== null && byMatchday.has(targetMd)) {
+            const fixtures = byMatchday.get(targetMd);
+            console.log('[loadMatchday] Fixtures for matchday', targetMd, ':', fixtures.length);
+            
+            // Speichere in __liveFixtures
+            if (!window.__liveFixtures) window.__liveFixtures = {};
+            if (!window.__liveFixtures[league]) window.__liveFixtures[league] = {};
+            
+            const converted = fixtures.map(m => ({
+              id: m.id,
+              home: m.homeTeam?.name || 'Heim',
+              away: m.awayTeam?.name || 'Auswärts',
+              kickoff: m.utcDate ? new Date(m.utcDate).getTime() : Date.now() + 86400000,
+              matchday: targetMd
+            }));
+            
+            converted.forEach(c => {
+              window.__liveFixtures[league][String(c.id)] = c;
+            });
+            
+            console.log('[loadMatchday] RENDERING LIVE:', converted.length, 'fixtures');
+            const label = `Spieltag ${targetMd}`;
+            await renderMatchdayFixtures(league, converted, label);
+            return;
+          }
+        }
+      } else {
+        console.error('[loadMatchday] API Error - Status:', res.status, res.statusText);
+        const errText = await res.text();
+        console.error('[loadMatchday] Error response:', errText);
+      }
+    } catch (err) {
+      console.error('[loadMatchday] Exception:', err.name, err.message);
+    }
+  }
+  
+  // Fallback
+  console.log('[loadMatchday] FALLBACK: Showing static test data');
+  const fallbackFixtures = MATCHDAY_FIXTURES[league] || [];
+  await renderMatchdayFixtures(league, fallbackFixtures, null);
+}
+
 // Exponiere loadMatchday sofort global
 window.loadMatchday = loadMatchday;
 
 // Persistiere Wetten unter footballBets/{uid}/bets
-      <!-- Matchday Live Fixtures Enhancer removed for compatibility; will re-add after testing -->
 
 async function placeBet(league, matchId) {
   console.log('placeBet called:', league, matchId);
   const feedbackEl = document.getElementById('betFeedback');
   const uid = getCurrentUid();
-  const safeNotify = (title, msg) => { try { if (window.showNotification) window.showNotification(title, msg); } catch(_) {} };
+  const db = __getDb();
+  const safeNotify = (title, msg) => { try { if (window.showNotification) window.showNotification(title, msg); else alert(`${title}: ${msg}`); } catch(_) { alert(`${title}: ${msg}`); } };
+  if (!db) {
+    if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Backend noch nicht bereit. Bitte Seite neu laden.</span>';
+    safeNotify('Fehler', 'Backend noch nicht bereit. Bitte kurz warten oder neu laden.');
+    return;
+  }
   
   if (!uid) { 
     if (feedbackEl) feedbackEl.innerHTML = '<span style="color:#e74c3c;">❌ Bitte einloggen.</span>'; 
@@ -3014,7 +3166,7 @@ async function placeBet(league, matchId) {
 
   try {
     console.log('Placing bet...');
-    const betsCol = collection(__getDb(), 'footballBets', uid, 'bets');
+    const betsCol = collection(db, 'footballBets', uid, 'bets');
     const betRef = doc(betsCol);
     
     await setDoc(betRef, {
@@ -3088,34 +3240,48 @@ setInterval(refreshMatchLocks, 60000);
 
 // Admin: Ergebnisse setzen und auszahlen (Donnerstag ausführen)
 async function adminSetResult(league, matchId, finalHomeGoals, finalAwayGoals) {
-  const uid = getCurrentUid();
-  if (!uid) return;
+  const db = __getDb();
+  if (!db) {
+    console.error('adminSetResult: db not ready');
+    return;
+  }
   const tendencyFinal = finalHomeGoals === finalAwayGoals ? 'X' : (finalHomeGoals > finalAwayGoals ? '1' : '2');
   const finalScoreStr = `${finalHomeGoals}:${finalAwayGoals}`;
 
-  const betsSnap = await getDocs(query(collection(__getDb(), 'footballBets', uid, 'bets')));
+  // Hole alle offenen Wetten für diesen Spieltag (alle Nutzer)
+  const betsSnap = await getDocs(query(
+    collectionGroup(db, 'bets'),
+    where('league', '==', league),
+    where('matchId', '==', matchId),
+    where('status', '==', 'pending')
+  ));
+
   const updates = [];
   betsSnap.forEach(docSnap => {
     const b = docSnap.data();
-    if (b.league === league && b.matchId === matchId && b.status === 'pending') {
-      let payout = 0;
-      if (b.scorePred && b.scorePred.trim() === finalScoreStr) {
-        payout = b.stake * 3;
-      } else if (b.tendency && b.tendency === tendencyFinal) {
-        payout = b.stake * 2;
-      }
-      updates.push({ id: docSnap.id, payout });
+    let payout = 0;
+    if (b.scorePred && b.scorePred.trim() === finalScoreStr) {
+      payout = b.stake * 3;
+    } else if (b.tendency && b.tendency === tendencyFinal) {
+      payout = b.stake * 2;
     }
+    updates.push({
+      path: docSnap.ref,
+      uid: b.uid,
+      payout
+    });
   });
 
   for (const u of updates) {
-    await updateDoc(doc(__getDb(), 'footballBets', uid, 'bets', u.id), {
+    await updateDoc(u.path, {
       status: 'settled',
       settledAt: serverTimestamp(),
       finalScore: finalScoreStr,
       payout: u.payout
     });
-    if (u.payout > 0) await addCoinsSimple(u.payout);
+    if (u.payout > 0) {
+      await addCoinsTo(u.uid, u.payout);
+    }
   }
 }
 
@@ -3641,6 +3807,26 @@ document.addEventListener('DOMContentLoaded', () => {
       <p style="font-size:12px;">Steuerung: Space oder Klick zum Springen</p>
     </div>
 
+    <!-- Traffic Dodger Game -->
+    <div class="card game-item">
+      <h3>🚗 Traffic Dodger</h3>
+      <div style="width:100%; overflow:hidden; border-radius:8px; border:2px solid #ccc; background:#1a1a1a; position:relative;">
+        <canvas id="trafficCanvas" width="600" height="400" style="display:block; width:100%; height:auto; background:linear-gradient(to bottom, #87ceeb, #e0f6ff);"></canvas>
+      </div>
+      <button onclick="startTraffic()" style="width:100%; margin:5px 0;">Start</button>
+      <button onclick="resetTraffic()" style="width:100%; margin:5px 0;">Neu</button>
+      <button onclick="openTrafficRanking()" style="width:100%;">🏆 Rangliste</button>
+      
+      <!-- Score-Anzeige -->
+      <div style="margin-top:8px; font-size:12px;">
+        <span>Score: <strong id="trafficScore">0</strong></span> | 
+        <span>High: <strong id="trafficHigh">0</strong></span> |
+        <span>Level: <strong id="trafficLevel">1</strong></span>
+      </div>
+
+      <p style="font-size:12px;">Steuerung: A/D oder Pfeiltasten Links/Rechts zum Ausweichen</p>
+    </div>
+
     <!-- Slot Machine -->
     <div class="card game-item">
       <h3>🎰 Slot Machine</h3>
@@ -4132,7 +4318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <h1>🔥 Top Spiele</h1>
 
     <!-- ⚽ Spieltag Tipps (Top 5 Ligen) -->
-    <div class="card" id="matchdayTipsCard" style="max-width:1400px; width:100%; margin:0 auto;">
+    <div class="card" id="matchdayTipsCard" style="max-width:1400px; width:100%; margin:0 auto; display:none;">
       <button id="setApiTokenBtn" style="float:right; margin-top:-8px; margin-right:-8px; background:#007bff; color:#fff; border-radius:6px; border:none; padding:6px 12px; font-size:13px; cursor:pointer; display:none;">API Token</button>
       <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -4587,7 +4773,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <!-- Matchday Tips Ranking Modal -->
-<div id="matchdayRankingModal" class="auth-modal">
+<div id="matchdayRankingModal" class="auth-modal" style="display:none !important;">
   <div class="auth-modal-content">
     <span class="auth-close" onclick="closeMatchdayRanking()">&times;</span>
     <h2>🏆 Spieltag Tipps Rangliste (Top 10)</h2>
@@ -4694,6 +4880,16 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     
     <div id="dinoRankingList" style="max-height:400px; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- Traffic Dodger Ranking Modal -->
+<div id="trafficRankingModal" class="auth-modal">
+  <div class="auth-modal-content">
+    <span class="auth-close" onclick="closeTrafficRanking()">&times;</span>
+    <h2>🏆 Traffic Dodger Rangliste (Top 10)</h2>
+    
+    <div id="trafficRankingList" style="max-height:400px; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -7417,90 +7613,47 @@ window.closeEmailVerification = function() {
 window.openAccountSettings = async function() {
   if (!currentUser) return;
   
-  const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-  if (userDoc.exists()) {
-    const data = userDoc.data();
-    currentProfilePic = data.profilePic || getDefaultProfilePic();
-    document.getElementById('accountProfilePic').src = currentProfilePic;
-    document.getElementById('newNickname').value = data.nickname || '';
-    document.getElementById('newEmail').value = data.email || '';
-    
-    // Statistiken laden
-    const joinDate = data.createdAt?.toDate?.();
-    if (joinDate) {
-      document.getElementById('accountJoinDate').textContent = joinDate.toLocaleDateString('de-DE');
-    } else {
-      document.getElementById('accountJoinDate').textContent = 'Unbekannt';
-    }
-    
-    // Chat-Nachrichten zählen
-    const chatQuery = query(collection(db, 'chat'), where('uid', '==', currentUser.uid));
-    const chatSnap = await getDocs(chatQuery);
-    document.getElementById('accountChatMessages').textContent = chatSnap.size;
-    
-    // Lieblingsspiel berechnen basierend auf Spielstunden der letzten 5 Tage
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-    
-    const snakeQ = query(collection(db, 'snakeScores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    const towerQ = query(collection(db, 'towerScores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    const penaltyQ = query(collection(db, 'penaltyScores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    const chessQ = query(collection(db, 'chessScores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    const flappyQ = query(collection(db, 'flappyScores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    const dinoQ = query(collection(db, 'dinoScores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    const c4Q = query(collection(db, 'c4Scores'), where('uid', '==', currentUser.uid), where('timestamp', '>=', fiveDaysAgo));
-    
-    const [snakeSnap, towerSnap, penaltySnap, chessSnap, flappySnap, dinoSnap, c4Snap] = await Promise.all([
-      getDocs(snakeQ),
-      getDocs(towerQ),
-      getDocs(penaltyQ),
-      getDocs(chessQ),
-      getDocs(flappyQ),
-      getDocs(dinoQ),
-      getDocs(c4Q)
-    ]);
-    
-    const gameCounts = {
-      '🐍 Snake': snakeSnap.size,
-      '🏗️ Tower Stack': towerSnap.size,
-      '⭕❌ TicTacToe': data.tttStats?.total || 0,
-      '🧩 Sudoku': data.sudokuStats?.total || 0,
-      '⚽ Elfmeterschießen': penaltySnap.size,
-      '♟️ Schach': chessSnap.size,
-      '🐦 Flappy Bird': flappySnap.size,
-      '🦖 Dino Run': dinoSnap.size,
-      '🔴🔵 4 Gewinnt': c4Snap.size
-    };
-    
-    let favoriteGame = '-';
-    let maxCount = 0;
-    for (const [game, count] of Object.entries(gameCounts)) {
-      if (count > maxCount) {
-        maxCount = count;
-        favoriteGame = game;
-      }
-    }
-    document.getElementById('accountFavoriteGame').textContent = maxCount > 0 ? favoriteGame : '-';
-    
-    // Höchster Slot-Gewinn
-    const slotHighWin = data.slotHighWin || 0;
-    document.getElementById('accountSlotHighWin').textContent = slotHighWin > 0 ? slotHighWin : '-';
-    
-    // Nickname-Änderungskosten anzeigen
-    const nicknameChanged = data.nicknameChanged || false;
-    const costInfoEl = document.getElementById('nicknameCostInfo');
-    if (costInfoEl) {
-      if (nicknameChanged) {
-        costInfoEl.textContent = 'Kosten: 🪙 1000 Münzen';
-        costInfoEl.style.color = '#ff6b6b';
-      } else {
-        costInfoEl.textContent = '✨ Erste Änderung kostenlos!';
-        costInfoEl.style.color = '#28a745';
-      }
-    }
-  }
-  
+  // Modal sofort öffnen
   document.getElementById('accountSettingsModal').style.display = 'flex';
+  
+  try {
+    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      currentProfilePic = data.profilePic || getDefaultProfilePic();
+      document.getElementById('accountProfilePic').src = currentProfilePic;
+      document.getElementById('newNickname').value = data.nickname || '';
+      document.getElementById('newEmail').value = data.email || '';
+      
+      // Statistiken aus User-Daten laden (ohne extra Queries)
+      const joinDate = data.createdAt?.toDate?.();
+      if (joinDate) {
+        document.getElementById('accountJoinDate').textContent = joinDate.toLocaleDateString('de-DE');
+      } else {
+        document.getElementById('accountJoinDate').textContent = 'Unbekannt';
+      }
+      
+      // Statistiken direkt aus User-Daten
+      document.getElementById('accountChatMessages').textContent = data.chatMessageCount || '-';
+      document.getElementById('accountFavoriteGame').textContent = data.favoriteGame || '-';
+      document.getElementById('accountSlotHighWin').textContent = (data.slotHighWin || 0) || '-';
+      
+      // Nickname-Änderungskosten anzeigen
+      const nicknameChanged = data.nicknameChanged || false;
+      const costInfoEl = document.getElementById('nicknameCostInfo');
+      if (costInfoEl) {
+        if (nicknameChanged) {
+          costInfoEl.textContent = 'Kosten: 🪙 1000 Münzen';
+          costInfoEl.style.color = '#ff6b6b';
+        } else {
+          costInfoEl.textContent = '✨ Erste Änderung kostenlos!';
+          costInfoEl.style.color = '#28a745';
+        }
+      }
+    }
+  } catch(err) {
+    console.error('Fehler beim Laden der Account-Einstellungen:', err);
+  }
 };
 
 window.closeAccountSettings = function() {
@@ -8144,6 +8297,9 @@ window.openUserProfile = async function(uid) {
     
     const data = userDoc.data();
     
+    // Öffne Modal sofort mit Basisdaten
+    document.getElementById('userProfileModal').style.display = 'flex';
+    
     // Profilbild und Nickname
     document.getElementById('profileModalPic').src = data.profilePic || getDefaultProfilePic();
     const nicknameEl = document.getElementById('profileModalNickname');
@@ -8240,120 +8396,27 @@ window.openUserProfile = async function(uid) {
     const statusText = online ? 'Online' : `Offline • ${rel(diffMs)}`;
     statusEl.innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:${statusColor}; display:inline-block;"></span> <span style="color:${statusColor}">${statusText}</span>`;
 
+    
     // Beigetreten
     const joinDate = data.createdAt?.toDate?.();
     document.getElementById('profileModalJoinDate').textContent = joinDate ? joinDate.toLocaleDateString('de-DE') : 'Unbekannt';
     
-    // Chat-Nachrichten
-    const chatQuery = query(collection(db, 'chat'), where('uid', '==', uid));
-    const chatSnap = await getDocs(chatQuery);
-    document.getElementById('profileModalChatMessages').textContent = chatSnap.size;
+    // Statistiken aus User-Daten (ohne zusätzliche Queries)
+    document.getElementById('profileModalChatMessages').textContent = data.chatMessageCount || '-';
+    document.getElementById('profileModalSnakeScore').textContent = data.snakeHighScore || '-';
+    document.getElementById('profileModalTowerScore').textContent = data.towerHighScore || '-';
+    document.getElementById('profileModalTTTWins').textContent = (data.tttStats?.total || 0) || '-';
+    document.getElementById('profileModalSudokuWins').textContent = (data.sudokuStats?.total || 0) || '-';
+    document.getElementById('profileModalPenaltyGoals').textContent = data.penaltyGoals || '-';
+    document.getElementById('profileModalChessWins').textContent = data.chessWins || '-';
+    document.getElementById('profileModalFavoriteGame').textContent = data.favoriteGame || '-';
+    document.getElementById('profileModalSlotHighWin').textContent = (data.slotHighWin || 0) || '-';
     
-    // Snake Highscore
-    const snakeQuery = query(collection(db, 'snakeScores'), where('uid', '==', uid));
-    const snakeSnap = await getDocs(snakeQuery);
-    let snakeMax = 0;
-    snakeSnap.forEach(d => {
-      const score = d.data().score || 0;
-      if (score > snakeMax) snakeMax = score;
-    });
-    document.getElementById('profileModalSnakeScore').textContent = snakeMax > 0 ? snakeMax : '-';
-    
-    // Tower Stack Highscore
-    const towerQuery = query(collection(db, 'towerScores'), where('uid', '==', uid));
-    const towerSnap = await getDocs(towerQuery);
-    let towerMax = 0;
-    towerSnap.forEach(d => {
-      const score = d.data().score || 0;
-      if (score > towerMax) towerMax = score;
-    });
-    document.getElementById('profileModalTowerScore').textContent = towerMax > 0 ? towerMax : '-';
-    
-    // TicTacToe Siege
-    const tttWins = data.tttStats?.total || 0;
-    document.getElementById('profileModalTTTWins').textContent = tttWins > 0 ? tttWins : '-';
-    
-    // Sudoku Siege
-    const sudokuWins = data.sudokuStats?.total || 0;
-    document.getElementById('profileModalSudokuWins').textContent = sudokuWins > 0 ? sudokuWins : '-';
-    
-    // Penalty Tore
-    const penaltyQuery = query(collection(db, 'penaltyScores'), where('uid', '==', uid));
-    const penaltySnap = await getDocs(penaltyQuery);
-    let penaltyTotal = 0;
-    penaltySnap.forEach(d => {
-      penaltyTotal += d.data().goals || 0;
-    });
-    document.getElementById('profileModalPenaltyGoals').textContent = penaltyTotal > 0 ? penaltyTotal : '-';
-    
-    // Schach Siege
-    const chessQuery = query(collection(db, 'chessScores'), where('uid', '==', uid));
-    const chessSnap = await getDocs(chessQuery);
-    const chessWins = chessSnap.size;
-    document.getElementById('profileModalChessWins').textContent = chessWins > 0 ? chessWins : '-';
-    
-    // Lieblingsspiel berechnen basierend auf Spielstunden der letzten 5 Tage
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-    
-    const flappyQuery5d = query(collection(db, 'flappyScores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    const dinoQuery5d = query(collection(db, 'dinoScores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    const c4Query5d = query(collection(db, 'c4Scores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    
-    const [flappySnap5d, dinoSnap5d, c4Snap5d] = await Promise.all([
-      getDocs(flappyQuery5d),
-      getDocs(dinoQuery5d),
-      getDocs(c4Query5d)
-    ]);
-    
-    // Für Account Settings auch 5-Tage-Filter
-    const snakeQuery5d = query(collection(db, 'snakeScores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    const towerQuery5d = query(collection(db, 'towerScores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    const penaltyQuery5d = query(collection(db, 'penaltyScores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    const chessQuery5d = query(collection(db, 'chessScores'), where('uid', '==', uid), where('timestamp', '>=', fiveDaysAgo));
-    
-    const [snakeSnap5d, towerSnap5d, penaltySnap5d, chessSnap5d] = await Promise.all([
-      getDocs(snakeQuery5d),
-      getDocs(towerQuery5d),
-      getDocs(penaltyQuery5d),
-      getDocs(chessQuery5d)
-    ]);
-    
-    const gameCounts = {
-      '🐍 Snake': snakeSnap5d.size,
-      '🏗️ Tower Stack': towerSnap5d.size,
-      '⭕❌ TicTacToe': tttWins,
-      '🧩 Sudoku': sudokuWins,
-      '⚽ Elfmeterschießen': penaltySnap5d.size,
-      '♟️ Schach': chessSnap5d.size,
-      '🐦 Flappy Bird': flappySnap5d.size,
-      '🦖 Dino Run': dinoSnap5d.size,
-      '🔴🔵 4 Gewinnt': c4Snap5d.size
-    };
-    
-    let favoriteGame = '-';
-    let maxCount = 0;
-    for (const [game, count] of Object.entries(gameCounts)) {
-      if (count > maxCount) {
-        maxCount = count;
-        favoriteGame = game;
-      }
-    }
-    document.getElementById('profileModalFavoriteGame').textContent = maxCount > 0 ? favoriteGame : '-';
-    
-    // Höchster Slot-Gewinn (aus User-Daten)
-    const slotHighWin = data.slotHighWin || 0;
-    document.getElementById('profileModalSlotHighWin').textContent = slotHighWin > 0 ? slotHighWin : '-';
-    
-    // Modal öffnen
-    document.getElementById('userProfileModal').style.display = 'flex';
   } catch (err) {
     console.error('Fehler beim Laden des Profils:', err);
     showNotification('Fehler', 'Profil konnte nicht geladen werden.');
   }
-};
-
-window.closeUserProfile = function() {
+};window.closeUserProfile = function() {
   document.getElementById('userProfileModal').style.display = 'none';
 };
 
@@ -9791,6 +9854,57 @@ function playGameSound(type, game = 'general') {
   }
 }
 
+// Auto-Sound Funktion für Traffic Dodger
+function playCarSound(type) {
+  const oscillator = gameAudioContext.createOscillator();
+  const gainNode = gameAudioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(gameAudioContext.destination);
+  
+  const now = gameAudioContext.currentTime;
+  
+  switch(type) {
+    case 'dodge':
+      // Schneller Beep beim Ausweichen
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.2, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      oscillator.start(now);
+      oscillator.stop(now + 0.05);
+      break;
+      
+    case 'collision':
+      // Crash-Sound
+      oscillator.frequency.value = 60;
+      oscillator.type = 'sawtooth';
+      gainNode.gain.setValueAtTime(0.4, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      oscillator.start(now);
+      oscillator.stop(now + 0.3);
+      break;
+      
+    case 'levelup':
+      // Aufsteigende Töne beim Level-Up
+      const levelUpNotes = [440, 550, 660];
+      levelUpNotes.forEach((freq, i) => {
+        const osc = gameAudioContext.createOscillator();
+        const gain = gameAudioContext.createGain();
+        osc.connect(gain);
+        gain.connect(gameAudioContext.destination);
+        osc.frequency.value = freq;
+        osc.type = 'square';
+        const startTime = now + i * 0.08;
+        gain.gain.setValueAtTime(0.15, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.12);
+        osc.start(startTime);
+        osc.stop(startTime + 0.12);
+      });
+      break;
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -9820,7 +9934,17 @@ if (snakeHighLocalEl) snakeHighLocalEl.textContent = highLocal;
 if (snakeHighGlobalEl) snakeHighGlobalEl.textContent = highGlobal;
 
 function randFood() {
-  return {x: Math.floor(Math.random()*16), y: Math.floor(Math.random()*16)};
+  let newFood;
+  let isValid = false;
+  
+  // Solange bis freies Feld gefunden
+  while (!isValid) {
+    newFood = {x: Math.floor(Math.random()*16), y: Math.floor(Math.random()*16)};
+    // Prüfe ob nicht in Snake
+    isValid = !snake.some(s => s.x === newFood.x && s.y === newFood.y);
+  }
+  
+  return newFood;
 }
 
 function updateScoreDisplays() {
@@ -9874,18 +9998,93 @@ function loopSnake() {
 
 function drawSnake() {
   const isDark = document.body.classList.contains("dark-mode");
-  ctx.fillStyle = isDark ? "#000" : "#fff";
-  ctx.fillRect(0,0,320,320);
+  
+  // Gradient Hintergrund
+  const gradient = ctx.createLinearGradient(0, 0, 320, 320);
+  gradient.addColorStop(0, isDark ? "#0a0a0a" : "#f5f5f5");
+  gradient.addColorStop(1, isDark ? "#1a1a1a" : "#e0e0e0");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 320, 320);
+  
+  // Grid
+  ctx.strokeStyle = isDark ? "#333" : "#ddd";
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 16; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * 20, 0);
+    ctx.lineTo(i * 20, 320);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, i * 20);
+    ctx.lineTo(320, i * 20);
+    ctx.stroke();
+  }
 
-  ctx.fillStyle = "red";
-  ctx.fillRect(food.x*20, food.y*20, 18, 18);
+  // Food mit Glow-Effekt
+  const foodX = food.x * 20 + 9;
+  const foodY = food.y * 20 + 9;
+  ctx.fillStyle = "rgba(255, 100, 100, 0.3)";
+  ctx.beginPath();
+  ctx.arc(foodX, foodY, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ff6464";
+  ctx.beginPath();
+  ctx.arc(foodX, foodY, 9, 0, Math.PI * 2);
+  ctx.fill();
+  // Food-Glanz
+  ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+  ctx.beginPath();
+  ctx.arc(foodX - 3, foodY - 3, 3, 0, Math.PI * 2);
+  ctx.fill();
 
-  ctx.fillStyle = "green";
-  snake.forEach(s => {
-    ctx.fillRect(s.x*20, s.y*20, 18, 18);
+  // Snake mit Gradient und Details
+  snake.forEach((segment, index) => {
+    const x = segment.x * 20;
+    const y = segment.y * 20;
+    const isHead = index === 0; // Kopf ist das ERSTE Element
+    
+    if (isHead) {
+      // Kopf - mit Augen und Glow
+      const headGradient = ctx.createLinearGradient(x, y, x + 18, y + 18);
+      headGradient.addColorStop(0, "#00dd00");
+      headGradient.addColorStop(1, "#00aa00");
+      ctx.fillStyle = headGradient;
+      ctx.fillRect(x, y, 18, 18);
+      
+      // Augen basierend auf Richtung (zeigen in Bewegungsrichtung)
+      ctx.fillStyle = "#fff";
+      if (dir.x === 1) { // rechts - Augen rechts
+        ctx.fillRect(x + 14, y + 5, 2, 2);
+        ctx.fillRect(x + 14, y + 11, 2, 2);
+      } else if (dir.x === -1) { // links - Augen links
+        ctx.fillRect(x + 2, y + 5, 2, 2);
+        ctx.fillRect(x + 2, y + 11, 2, 2);
+      } else if (dir.y === -1) { // oben - Augen oben
+        ctx.fillRect(x + 5, y + 2, 2, 2);
+        ctx.fillRect(x + 11, y + 2, 2, 2);
+      } else { // unten - Augen unten
+        ctx.fillRect(x + 5, y + 14, 2, 2);
+        ctx.fillRect(x + 11, y + 14, 2, 2);
+      }
+      
+      // Glow
+      ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 2, y - 2, 22, 22);
+    } else {
+      // Körper - Gradient
+      const bodyGradient = ctx.createLinearGradient(x, y, x + 18, y + 18);
+      bodyGradient.addColorStop(0, "#00cc00");
+      bodyGradient.addColorStop(1, "#009900");
+      ctx.fillStyle = bodyGradient;
+      ctx.fillRect(x, y, 18, 18);
+      
+      // Grenze
+      ctx.strokeStyle = "rgba(0, 100, 0, 0.5)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, 18, 18);
+    }
   });
-
-  // Score im Canvas optional anzeigen (bereits im DOM)
 }
 
 function resetSnakeInternal() {
@@ -10009,7 +10208,6 @@ async function loadFlappyRankings(mode) {
   listEl.innerHTML = "<p>Wird geladen...</p>";
   
   try {
-    // Hole alle Scores aus Firebase
     const snapshot = await getDocs(collection(db, 'flappyScores'));
     
     if (snapshot.empty) {
@@ -10023,13 +10221,13 @@ async function loadFlappyRankings(mode) {
       scores.push({
         uid: data.uid,
         nickname: data.nickname || 'Unbekannt',
-        score: data.score || 0
+        score: data.score || 0,
+        date: data.createdAt?.toDate?.() || new Date()
       });
     });
     
     scores.sort((a, b) => b.score - a.score);
     
-    // Freunde-Filter anwenden
     if (currentFlappyRankingMode === 'friends') {
       scores = filterFriendsOnly(scores);
     }
@@ -10041,24 +10239,34 @@ async function loadFlappyRankings(mode) {
       return;
     }
     
-    let html = "<table style='width:100%; border-collapse:collapse;'>";
-    html += "<thead><tr style='border-bottom:2px solid #007bff;'><th style='padding:10px;'>#</th><th style='padding:10px; text-align:left;'>Spieler</th><th style='padding:10px;'>Score</th></tr></thead><tbody>";
+    const isDark = document.body.classList.contains("dark-mode");
+    const headerBg = "#007bff";
+    const headerText = "#fff";
+    const rowBg1 = isDark ? "#333" : "#f9f9f9";
+    const rowBg2 = isDark ? "#222" : "#fff";
+    const textColor = isDark ? "#f2f4f8" : "#111";
+    const borderColor = isDark ? "#555" : "#ddd";
     
-    let rank = 1;
-    for (const item of top10) {
+    let html = `<table style='width:100%; border-collapse:collapse; color:${textColor};'>`;
+    html += `<tr style='background:${headerBg}; color:${headerText};'><th style='padding:10px;'>#</th><th style='padding:10px; text-align:left;'>Spieler</th><th style='padding:10px;'>Score</th><th style='padding:10px;'>Datum</th></tr>`;
+    
+    for (let idx = 0; idx < top10.length; idx++) {
+      const item = top10[idx];
+      const bgColor = idx % 2 === 0 ? rowBg1 : rowBg2;
+      const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "";
       const profilePic = await getUserProfilePic(item.uid);
       
-      html += `<tr style='border-bottom:1px solid #ddd;'>`;
-      html += `<td style='padding:10px; text-align:center; font-weight:bold;'>${rank}</td>`;
-      html += `<td style='padding:10px; cursor:pointer;' onclick='openUserProfile("${item.uid}")'>`;
+      html += `<tr style="background:${bgColor}; border-bottom:1px solid ${borderColor}; color:${textColor};">`;
+      html += `<td style="padding:10px; text-align:center; font-weight:bold;">${medal} ${idx + 1}</td>`;
+      html += `<td style="padding:10px; cursor:pointer;" onclick="openUserProfile('${item.uid}')">`;
       html += `<img src='${profilePic}' style='width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:8px;'>`;
       html += `${item.nickname}</td>`;
-      html += `<td style='padding:10px; text-align:center; font-weight:bold; color:#007bff;'>${item.score}</td>`;
+      html += `<td style="padding:10px; text-align:center; font-weight:bold; color:#007bff;">${item.score}</td>`;
+      html += `<td style="padding:10px; font-size:12px;">${item.date.toLocaleDateString("de-DE")}</td>`;
       html += `</tr>`;
-      rank++;
     }
     
-    html += "</tbody></table>";
+    html += "</table>";
     listEl.innerHTML = html;
     
   } catch (err) {
@@ -10126,13 +10334,13 @@ async function loadDinoRankings(mode) {
       scores.push({
         uid: data.uid,
         nickname: data.nickname || 'Unbekannt',
-        score: data.score || 0
+        score: data.score || 0,
+        date: data.createdAt?.toDate?.() || new Date()
       });
     });
     
     scores.sort((a, b) => b.score - a.score);
     
-    // Freunde-Filter anwenden
     if (currentDinoRankingMode === 'friends') {
       scores = filterFriendsOnly(scores);
     }
@@ -10144,24 +10352,34 @@ async function loadDinoRankings(mode) {
       return;
     }
     
-    let html = "<table style='width:100%; border-collapse:collapse;'>";
-    html += "<thead><tr style='border-bottom:2px solid #007bff;'><th style='padding:10px;'>#</th><th style='padding:10px; text-align:left;'>Spieler</th><th style='padding:10px;'>Score</th></tr></thead><tbody>";
+    const isDark = document.body.classList.contains("dark-mode");
+    const headerBg = "#007bff";
+    const headerText = "#fff";
+    const rowBg1 = isDark ? "#333" : "#f9f9f9";
+    const rowBg2 = isDark ? "#222" : "#fff";
+    const textColor = isDark ? "#f2f4f8" : "#111";
+    const borderColor = isDark ? "#555" : "#ddd";
     
-    let rank = 1;
-    for (const item of top10) {
+    let html = `<table style='width:100%; border-collapse:collapse; color:${textColor};'>`;
+    html += `<tr style='background:${headerBg}; color:${headerText};'><th style='padding:10px;'>#</th><th style='padding:10px; text-align:left;'>Spieler</th><th style='padding:10px;'>Score</th><th style='padding:10px;'>Datum</th></tr>`;
+    
+    for (let idx = 0; idx < top10.length; idx++) {
+      const item = top10[idx];
+      const bgColor = idx % 2 === 0 ? rowBg1 : rowBg2;
+      const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "";
       const profilePic = await getUserProfilePic(item.uid);
       
-      html += `<tr style='border-bottom:1px solid #ddd;'>`;
-      html += `<td style='padding:10px; text-align:center; font-weight:bold;'>${rank}</td>`;
-      html += `<td style='padding:10px; cursor:pointer;' onclick='openUserProfile("${item.uid}")'>`;
+      html += `<tr style="background:${bgColor}; border-bottom:1px solid ${borderColor}; color:${textColor};">`;
+      html += `<td style="padding:10px; text-align:center; font-weight:bold;">${medal} ${idx + 1}</td>`;
+      html += `<td style="padding:10px; cursor:pointer;" onclick="openUserProfile('${item.uid}')">`;
       html += `<img src='${profilePic}' style='width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:8px;'>`;
       html += `${item.nickname}</td>`;
-      html += `<td style='padding:10px; text-align:center; font-weight:bold; color:#007bff;'>${item.score}</td>`;
+      html += `<td style="padding:10px; text-align:center; font-weight:bold; color:#007bff;">${item.score}</td>`;
+      html += `<td style="padding:10px; font-size:12px;">${item.date.toLocaleDateString("de-DE")}</td>`;
       html += `</tr>`;
-      rank++;
     }
     
-    html += "</tbody></table>";
+    html += "</table>";
     listEl.innerHTML = html;
     
   } catch (err) {
@@ -10258,35 +10476,121 @@ window.resetFlappy = function() {
 function drawFlappy() {
   const isDark = document.body.classList.contains("dark-mode");
   
-  // Background
-  flappyCtx.fillStyle = isDark ? "#1a1a2e" : "#87ceeb";
+  // Sky Gradient Background
+  const bgGradient = flappyCtx.createLinearGradient(0, 0, 0, flappyCanvas.height);
+  if (isDark) {
+    bgGradient.addColorStop(0, "#0f3460");
+    bgGradient.addColorStop(1, "#1a1a2e");
+  } else {
+    bgGradient.addColorStop(0, "#87ceeb");
+    bgGradient.addColorStop(1, "#e0f6ff");
+  }
+  flappyCtx.fillStyle = bgGradient;
   flappyCtx.fillRect(0, 0, flappyCanvas.width, flappyCanvas.height);
+  
+  // Clouds (dekorativ)
+  if (flappyRunning) {
+    flappyCtx.fillStyle = "rgba(255, 255, 255, 0.3)";
+    flappyCtx.beginPath();
+    flappyCtx.arc(50, 50, 20, 0, Math.PI * 2);
+    flappyCtx.arc(80, 50, 25, 0, Math.PI * 2);
+    flappyCtx.arc(110, 50, 20, 0, Math.PI * 2);
+    flappyCtx.fill();
+  }
 
-  // Bird
-  flappyCtx.fillStyle = "#FFD700";
+  // Bird mit Details
+  const birdWingOffset = Math.sin(performance.now() / 100) * 5; // Flügel-Animation
+  
+  // Vogel-Körper mit Gradient
+  const birdGradient = flappyCtx.createLinearGradient(birdX - birdSize, birdY - birdSize, birdX + birdSize, birdY + birdSize);
+  birdGradient.addColorStop(0, "#FFE34D");
+  birdGradient.addColorStop(1, "#FFC107");
+  flappyCtx.fillStyle = birdGradient;
   flappyCtx.beginPath();
   flappyCtx.arc(birdX, birdY, birdSize, 0, Math.PI * 2);
   flappyCtx.fill();
-
-  // Bird Eye
-  flappyCtx.fillStyle = "#000";
+  
+  // Vogel-Grenze
+  flappyCtx.strokeStyle = "#FF9800";
+  flappyCtx.lineWidth = 2;
   flappyCtx.beginPath();
-  flappyCtx.arc(birdX + 7, birdY - 5, 3, 0, Math.PI * 2);
+  flappyCtx.arc(birdX, birdY, birdSize, 0, Math.PI * 2);
+  flappyCtx.stroke();
+
+  // Flügel (oben & unten mit Animation)
+  flappyCtx.fillStyle = "#FF6B6B";
+  // Oberer Flügel
+  flappyCtx.beginPath();
+  flappyCtx.ellipse(birdX - 8, birdY - birdSize + 2, 8, 4, -0.3 + birdWingOffset * 0.02, 0, Math.PI * 2);
+  flappyCtx.fill();
+  // Unterer Flügel
+  flappyCtx.beginPath();
+  flappyCtx.ellipse(birdX - 8, birdY + birdSize - 2, 8, 4, 0.3 - birdWingOffset * 0.02, 0, Math.PI * 2);
   flappyCtx.fill();
 
-  // Pipes
-  flappyCtx.fillStyle = "#228B22";
-  pipes.forEach(pipe => {
-    // Top pipe
+  // Augen (groß & ausdrucksvoll)
+  flappyCtx.fillStyle = "#FFF";
+  flappyCtx.beginPath();
+  flappyCtx.arc(birdX + 6, birdY - 3, 4, 0, Math.PI * 2);
+  flappyCtx.fill();
+  
+  // Pupille
+  flappyCtx.fillStyle = "#000";
+  flappyCtx.beginPath();
+  flappyCtx.arc(birdX + 7, birdY - 3, 2.5, 0, Math.PI * 2);
+  flappyCtx.fill();
+  
+  // Augen-Glanz
+  flappyCtx.fillStyle = "rgba(255, 255, 255, 0.7)";
+  flappyCtx.beginPath();
+  flappyCtx.arc(birdX + 8, birdY - 4, 1, 0, Math.PI * 2);
+  flappyCtx.fill();
+  
+  // Schnabel
+  flappyCtx.fillStyle = "#FF9800";
+  flappyCtx.beginPath();
+  flappyCtx.moveTo(birdX + birdSize - 2, birdY - 2);
+  flappyCtx.lineTo(birdX + birdSize + 6, birdY);
+  flappyCtx.lineTo(birdX + birdSize - 2, birdY + 2);
+  flappyCtx.closePath();
+  flappyCtx.fill();
+
+  // Pipes mit Gradient & Detail
+  pipes.forEach((pipe, idx) => {
+    // Top pipe mit Gradient
+    const topPipeGradient = flappyCtx.createLinearGradient(pipe.x, 0, pipe.x + pipeWidth, 0);
+    topPipeGradient.addColorStop(0, "#2d5016");
+    topPipeGradient.addColorStop(0.5, "#3a6b1f");
+    topPipeGradient.addColorStop(1, "#2d5016");
+    flappyCtx.fillStyle = topPipeGradient;
     flappyCtx.fillRect(pipe.x, 0, pipeWidth, pipe.topHeight);
-    // Bottom pipe
+    
+    // Obere Pipe-Kante
+    flappyCtx.fillStyle = "#4a9d1f";
+    flappyCtx.fillRect(pipe.x, pipe.topHeight - 8, pipeWidth, 8);
+
+    // Bottom pipe mit Gradient
+    flappyCtx.fillStyle = topPipeGradient;
     flappyCtx.fillRect(pipe.x, pipe.topHeight + pipeGap, pipeWidth, flappyCanvas.height - pipe.topHeight - pipeGap);
+    
+    // Untere Pipe-Kante
+    flappyCtx.fillStyle = "#4a9d1f";
+    flappyCtx.fillRect(pipe.x, pipe.topHeight + pipeGap, pipeWidth, 8);
+    
+    // Pipe-Schatten
+    flappyCtx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+    flappyCtx.lineWidth = 2;
+    flappyCtx.strokeRect(pipe.x, 0, pipeWidth, pipe.topHeight);
+    flappyCtx.strokeRect(pipe.x, pipe.topHeight + pipeGap, pipeWidth, flappyCanvas.height - pipe.topHeight - pipeGap);
   });
 
-  // Score
-  flappyCtx.fillStyle = isDark ? "#f2f4f8" : "#000";
-  flappyCtx.font = "24px Arial";
-  flappyCtx.fillText("Score: " + flappyScore, 10, 30);
+  // Score-Display mit Schatten
+  flappyCtx.fillStyle = "rgba(0, 0, 0, 0.3)";
+  flappyCtx.font = "bold 32px Arial";
+  flappyCtx.fillText("Score: " + flappyScore, 12, 42);
+  
+  flappyCtx.fillStyle = isDark ? "#f2f4f8" : "#fff";
+  flappyCtx.fillText("Score: " + flappyScore, 10, 40);
 }
 
 function loopFlappy() {
@@ -11204,6 +11508,341 @@ drawDino();
 updateDinoDisplay();
 
 /////////////////////////////////////////////////////////////////////////////
+// TRAFFIC DODGER 🚗 – Ausweichen vor Autos, schneller werdend
+/////////////////////////////////////////////////////////////////////////////
+
+let trafficCanvas = null;
+let trafficCtx = null;
+let trafficRunning = false;
+let trafficScore = 0;
+let trafficHighScore = localStorage.getItem('trafficHighScore') ? parseInt(localStorage.getItem('trafficHighScore')) : 0;
+let trafficLevel = 1;
+let trafficGameTime = 0;
+let trafficStartTime = 0;
+
+// Spieler-Auto
+let playerCar = { x: 270, y: 350, width: 50, height: 60, color: '#00ff00' };
+
+// Gegner-Autos
+let trafficCars = [];
+let trafficCarSpawnRate = 2000; // ms zwischen Spawns
+let lastTrafficSpawn = 0;
+
+function initTraffic() {
+  trafficCanvas = document.getElementById('trafficCanvas');
+  if (!trafficCanvas) return;
+  trafficCtx = trafficCanvas.getContext('2d');
+  trafficHighScore = localStorage.getItem('trafficHighScore') ? parseInt(localStorage.getItem('trafficHighScore')) : 0;
+  updateTrafficDisplay();
+}
+
+function updateTrafficDisplay() {
+  document.getElementById('trafficScore').textContent = trafficScore;
+  document.getElementById('trafficHigh').textContent = trafficHighScore;
+  document.getElementById('trafficLevel').textContent = trafficLevel;
+}
+
+window.startTraffic = function() {
+  if (trafficRunning) return;
+  initTraffic();
+  
+  trafficRunning = true;
+  trafficScore = 0;
+  trafficLevel = 1;
+  trafficGameTime = 0;
+  trafficCars = [];
+  trafficCarSpawnRate = 2000;
+  lastTrafficSpawn = Date.now();
+  trafficStartTime = Date.now();
+  playerCar.x = 270;
+  
+  updateTrafficDisplay();
+  playGameSound('gameStart');
+  trafficGameLoop();
+};
+
+window.resetTraffic = function() {
+  trafficRunning = false;
+  trafficScore = 0;
+  trafficLevel = 1;
+  trafficCars = [];
+  if (trafficCtx) {
+    trafficCtx.fillStyle = '#e0f6ff';
+    trafficCtx.fillRect(0, 0, trafficCanvas.width, trafficCanvas.height);
+  }
+  updateTrafficDisplay();
+};
+
+function trafficGameLoop() {
+  if (!trafficRunning || !trafficCtx) return;
+  
+  trafficGameTime = (Date.now() - trafficStartTime) / 1000;
+  
+  // Geschwindigkeit basierend auf Zeit erhöhen
+  const newLevel = Math.floor(trafficGameTime / 10) + 1;
+  if (newLevel > trafficLevel) {
+    trafficLevel = newLevel;
+    playCarSound('levelup');
+  }
+  let baseSpeed = 3 + (trafficLevel - 1) * 0.5; // Startet bei 3, +0.5 pro Level
+  trafficCarSpawnRate = Math.max(800, 2000 - trafficLevel * 100); // Schneller spawnen
+  
+  // Auto spawnen
+  const now = Date.now();
+  if (now - lastTrafficSpawn > trafficCarSpawnRate) {
+    const lanes = [100, 250, 400];
+    const lane = lanes[Math.floor(Math.random() * lanes.length)];
+    trafficCars.push({
+      x: lane,
+      y: -60,
+      width: 50,
+      height: 60,
+      speed: baseSpeed + Math.random() * 1.5,
+      color: ['#ff0000', '#0000ff', '#ffff00'][Math.floor(Math.random() * 3)]
+    });
+    lastTrafficSpawn = now;
+  }
+  
+  // Auto bewegen
+  trafficCars = trafficCars.filter(car => car.y < 420);
+  trafficCars.forEach(car => {
+    car.y += car.speed;
+  });
+  
+  // Kollisions-Check
+  for (let car of trafficCars) {
+    if (checkCollision(playerCar, car)) {
+      endTrafficGame();
+      return;
+    }
+  }
+  
+  // Score: +1 pro Auto das vorbeifährt
+  trafficCars.forEach(car => {
+    if (!car.counted && car.y > trafficCanvas.height) {
+      trafficScore += 10;
+      car.counted = true;
+      playGameSound('score');
+    }
+  });
+  
+  // Draw
+  trafficCtx.fillStyle = '#e0f6ff';
+  trafficCtx.fillRect(0, 0, trafficCanvas.width, trafficCanvas.height);
+  
+  // Straßen-Markierungen
+  trafficCtx.strokeStyle = '#ffffff';
+  trafficCtx.lineWidth = 3;
+  trafficCtx.setLineDash([20, 20]);
+  trafficCtx.beginPath();
+  trafficCtx.moveTo(150, 0);
+  trafficCtx.lineTo(150, trafficCanvas.height);
+  trafficCtx.stroke();
+  trafficCtx.beginPath();
+  trafficCtx.moveTo(300, 0);
+  trafficCtx.lineTo(300, trafficCanvas.height);
+  trafficCtx.stroke();
+  trafficCtx.setLineDash([]);
+  
+  // Gegner-Autos zeichnen (bessere Grafiken)
+  trafficCars.forEach(car => {
+    drawCar(trafficCtx, car.x, car.y, car.width, car.height, car.color);
+  });
+  
+  // Spieler-Auto zeichnen
+  drawCar(trafficCtx, playerCar.x, playerCar.y, playerCar.width, playerCar.height, playerCar.color);
+  
+  // HUD
+  trafficCtx.fillStyle = '#000';
+  trafficCtx.font = 'bold 14px Arial';
+  trafficCtx.fillText(`Score: ${trafficScore}`, 10, 20);
+  trafficCtx.fillText(`Level: ${trafficLevel}`, 10, 40);
+  trafficCtx.fillText(`Time: ${trafficGameTime.toFixed(1)}s`, 10, 60);
+  
+  updateTrafficDisplay();
+  requestAnimationFrame(trafficGameLoop);
+}
+
+function drawCar(ctx, x, y, w, h, color) {
+  // Karosserie
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y + h * 0.3, w, h * 0.4);
+  
+  // Dach
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x + w * 0.1, y + h * 0.3);
+  ctx.lineTo(x + w * 0.9, y + h * 0.3);
+  ctx.lineTo(x + w * 0.8, y);
+  ctx.lineTo(x + w * 0.2, y);
+  ctx.closePath();
+  ctx.fill();
+  
+  // Fenster
+  ctx.fillStyle = '#87CEEB';
+  ctx.fillRect(x + w * 0.15, y + h * 0.05, w * 0.3, h * 0.15);
+  ctx.fillRect(x + w * 0.55, y + h * 0.05, w * 0.3, h * 0.15);
+  
+  // Räder
+  ctx.fillStyle = '#333';
+  ctx.beginPath();
+  ctx.arc(x + w * 0.25, y + h * 0.7, w * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x + w * 0.75, y + h * 0.7, w * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Felgen
+  ctx.strokeStyle = '#666';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(x + w * 0.25, y + h * 0.7, w * 0.1, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x + w * 0.75, y + h * 0.7, w * 0.1, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Licht
+  ctx.fillStyle = color === '#00ff00' ? '#ffff00' : '#ffffff';
+  ctx.fillRect(x + w * 0.05, y + h * 0.35, w * 0.08, h * 0.1);
+  ctx.fillRect(x + w * 0.87, y + h * 0.35, w * 0.08, h * 0.1);
+}
+
+function checkCollision(rect1, rect2) {
+  return rect1.x < rect2.x + rect2.width &&
+         rect1.x + rect1.width > rect2.x &&
+         rect1.y < rect2.y + rect2.height &&
+         rect1.y + rect1.height > rect2.y;
+}
+
+async function endTrafficGame() {
+  trafficRunning = false;
+  playCarSound('collision');
+  playGameSound('gameover');
+  
+  if (trafficScore > trafficHighScore) {
+    trafficHighScore = trafficScore;
+    localStorage.setItem('trafficHighScore', trafficHighScore);
+  }
+  
+  // Score in Firebase speichern
+  if (currentUser && currentNickname) {
+    try {
+      await addDoc(collection(db, 'trafficScores'), {
+        uid: currentUser.uid,
+        nickname: currentNickname,
+        score: trafficScore,
+        level: trafficLevel,
+        createdAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.error('Fehler beim Speichern des Traffic Scores:', err);
+    }
+  }
+  
+  // Münzen hinzufügen
+  if (currentUser && trafficScore > 0) {
+    const coins = Math.floor(trafficScore / 3);
+    await addCoins(coins);
+    await updateBPQuestProgress('trafficScore', trafficScore);
+    await trackGamePlayed('traffic');
+    showNotification('Traffic Dodger', `Game Over! Score: ${trafficScore} | Level: ${trafficLevel} | 🪙 +${coins} Münzen`);
+  } else {
+    showNotification('Traffic Dodger', `Game Over! Score: ${trafficScore}`);
+  }
+  
+  updateTrafficDisplay();
+}
+
+// Rangliste laden
+async function loadTrafficRankings() {
+  const listEl = document.getElementById('trafficRankingList');
+  if (!listEl) return;
+  
+  listEl.innerHTML = "<p>Wird geladen...</p>";
+  
+  try {
+    const q = query(collection(db, 'trafficScores'), orderBy('score', 'desc'), limit(10));
+    const snap = await getDocs(q);
+    
+    if (snap.empty) {
+      listEl.innerHTML = "<p style='text-align:center; opacity:0.6;'>Noch keine Einträge</p>";
+      return;
+    }
+    
+    const isDark = document.body.classList.contains("dark-mode");
+    const headerBg = "#007bff";
+    const headerText = "#fff";
+    const rowBg1 = isDark ? "#333" : "#f9f9f9";
+    const rowBg2 = isDark ? "#222" : "#fff";
+    const textColor = isDark ? "#f2f4f8" : "#111";
+    const borderColor = isDark ? "#555" : "#ddd";
+    
+    let html = `<table style='width:100%; border-collapse:collapse; color:${textColor};'>`;
+    html += `<tr style='background:${headerBg}; color:${headerText};'><th style='padding:10px;'>#</th><th style='padding:10px; text-align:left;'>Spieler</th><th style='padding:10px;'>Score</th><th style='padding:10px;'>Level</th></tr>`;
+    
+    let rank = 1;
+    snap.forEach((doc, idx) => {
+      const data = doc.data();
+      const bgColor = idx % 2 === 0 ? rowBg1 : rowBg2;
+      const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "";
+      
+      html += `<tr style="background:${bgColor}; border-bottom:1px solid ${borderColor}; color:${textColor};">`;
+      html += `<td style="padding:10px; text-align:center; font-weight:bold;">${medal} ${rank}</td>`;
+      html += `<td style="padding:10px;">${data.nickname || 'Unbekannt'}</td>`;
+      html += `<td style="padding:10px; text-align:center; font-weight:bold; color:#007bff;">${data.score || 0}</td>`;
+      html += `<td style="padding:10px; text-align:center;">${data.level || 1}</td>`;
+      html += `</tr>`;
+      rank++;
+    });
+    
+    html += '</table>';
+    listEl.innerHTML = html;
+  } catch (err) {
+    console.error('Fehler beim Laden der Traffic Rankings:', err);
+    listEl.innerHTML = '<p style="color:red;">Fehler beim Laden der Rangliste</p>';
+  }
+}
+
+window.openTrafficRanking = async function() {
+  const modal = document.getElementById('trafficRankingModal');
+  if (!modal) return;
+  
+  await loadTrafficRankings();
+  modal.style.display = 'flex';
+};
+
+window.closeTrafficRanking = function() {
+  const modal = document.getElementById('trafficRankingModal');
+  if (!modal) return;
+  modal.style.display = 'none';
+};
+
+const trafficRankingModalEl = document.getElementById('trafficRankingModal');
+if (trafficRankingModalEl) {
+  trafficRankingModalEl.addEventListener('click', (e) => {
+    if (e.target === trafficRankingModalEl) {
+      window.closeTrafficRanking();
+    }
+  });
+}
+
+// Steuerung
+document.addEventListener('keydown', (e) => {
+  if (trafficRunning && (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft')) {
+    e.preventDefault();
+    playerCar.x = Math.max(75, playerCar.x - 150);
+    playGameSound('select');
+    playCarSound('dodge');
+  }
+  if (trafficRunning && (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight')) {
+    e.preventDefault();
+    playerCar.x = Math.min(425, playerCar.x + 150);
+    playGameSound('select');
+  }
+});
+
+/////////////////////////////////////////////////////////////////////////////
 // TOWER STACK GAME 🏗️
 /////////////////////////////////////////////////////////////////////////////
 
@@ -11752,9 +12391,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist 3 + 2?",
-    answers: ["4", "5", "6", "7"],
-    correct: 1
+    question: "Was ist die Höchstpunktzahl beim Darts?",
+    answers: ["150", "175", "180", "200"],
+    correct: 2
   },
   {
     question: "Welches Tier lebt im Wasser?",
@@ -13524,9 +14163,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Uganda?",
-    answers: ["Nairobi", "Dodoma", "Kampala", "Kigali"],
-    correct: 2
+    question: "Welches land ist flächenmässig das grösste??",
+    answers: ["Indien", "Kanada", "China", "Russland"],
+    correct: 3
   },
   {
     question: "Wie viele Zähne hat ein Elefant zum Kauen?",
@@ -13539,9 +14178,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Sambia?",
-    answers: ["Harare", "Lusaka", "Lilongwe", "Gaborone"],
-    correct: 1
+    question: "In welchem land liegt der Mount Everest?",
+    answers: ["Indien", "Pakistan", "Kasachstan", "Nepal"],
+    correct: 3
   },
   {
     question: "Wie heißt die größte Spinnenart?",
@@ -13554,7 +14193,7 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Simbabwe?",
+    question: "Was ist die Währung in Simbabwe?",
     answers: ["Bulawayo", "Harare", "Mutare", "Gweru"],
     correct: 1
   },
@@ -13569,8 +14208,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Mosambik?",
-    answers: ["Beira", "Nampula", "Maputo", "Quelimane"],
+    question: "Welche Firma übertreibt es mit den Sauren Drachenzungen?",
+    answers: ["Haribo", "Trolli", "Hitschies", "Katjes"],
     correct: 2
   },
   {
@@ -13584,9 +14223,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 0
   },
   {
-    question: "Was ist die Hauptstadt von Namibia?",
-    answers: ["Swakopmund", "Walvis Bay", "Windhoek", "Oshakati"],
-    correct: 2
+    question: "Wie heisst der Kumpel von Karies?",
+    answers: ["Omnibus", "Spartakus", "Markus", "Baktus"],
+    correct: 3
   },
   {
     question: "Wie viele Fußballfelder passen in einen Quadratkilometer?",
@@ -13599,9 +14238,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 1
   },
   {
-    question: "Was ist die Hauptstadt von Botswana?",
-    answers: ["Francistown", "Maun", "Gaborone", "Kasane"],
-    correct: 2
+    question: "Welche Firma steckt hinter Fortnite?",
+    answers: ["Epic Games", "Valve", "Activision", "Ubisoft"],
+    correct: 0
   },
   {
     question: "Wie heißt der größte Stern im Universum?",
@@ -13614,9 +14253,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Angola?",
-    answers: ["Benguela", "Huambo", "Luanda", "Lobito"],
-    correct: 2
+    question: "Wo wurde laut der Bible Jesus geboren?",
+    answers: ["Nazareth", "Bethlehem", "Jerusalem", "Capernaum"],
+    correct: 1
   },
   {
     question: "Wie viele Flossen hat ein typischer Fisch?",
@@ -13629,9 +14268,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 1
   },
   {
-    question: "Was ist die Hauptstadt von Madagaskar?",
-    answers: ["Toamasina", "Antsirabe", "Antananarivo", "Mahajanga"],
-    correct: 2
+    question: "Wer war der erste Bundeskanzler Deutschlands?",
+    answers: ["Konrad Adenauer", "Willy Brandt", "Helmut Kohl", "Gerhard Schröder"],
+    correct: 0
   },
   {
     question: "Wie nennt man Tiere, die Aas fressen?",
@@ -13644,9 +14283,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 3
   },
   {
-    question: "Was ist die Hauptstadt von Mauretanien?",
-    answers: ["Nouadhibou", "Nouakchott", "Kaédi", "Zouerate"],
-    correct: 1
+    question: "Aus welchem land stammt Nutella?",
+    answers: ["Österreich", "Deutschland", "Spanien", "Italien"],
+    correct: 3
   },
   {
     question: "Wie viele Beine hat ein Tausendfüßler wirklich?",
@@ -13659,8 +14298,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 0
   },
   {
-    question: "Was ist die Hauptstadt von Niger?",
-    answers: ["Agadez", "Zinder", "Niamey", "Maradi"],
+    question: "Welches Wort wird kritisch wenn man es rückwärts ausspricht?",
+    answers: ["Lagerregal", "Sarg", "Regen", "Rentner"],
     correct: 2
   },
   {
@@ -13674,8 +14313,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 1
   },
   {
-    question: "Was ist die Hauptstadt von Mali?",
-    answers: ["Timbuktu", "Gao", "Bamako", "Sikasso"],
+    question: "In welchem Land liegt Tschernobyl?",
+    answers: ["Belarus", "Russland", "Ukraine", "Polen"],
     correct: 2
   },
   {
@@ -13689,9 +14328,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 0
   },
   {
-    question: "Was ist die Hauptstadt von Tschad?",
-    answers: ["Moundou", "Sarh", "N'Djamena", "Abéché"],
-    correct: 2
+    question: "Was war das Jugendwort des Jahres 2024?",
+    answers: ["Schere", "Talahon", "Nein Pascal ich denke nicht", "Aura"],
+    correct: 3
   },
   {
     question: "Wie nennt man die Lehre von den Reptilien?",
@@ -13704,9 +14343,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 3
   },
   {
-    question: "Was ist die Hauptstadt von Burkina Faso?",
-    answers: ["Bobo-Dioulasso", "Koudougou", "Ouagadougou", "Banfora"],
-    correct: 2
+    question: "Wie viele Seiten hat ein Okatagon?",
+    answers: ["6", "8", "10", "12"],
+    correct: 1
   },
   {
     question: "Wie viele Augen hat eine Libelle?",
@@ -13719,9 +14358,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 3
   },
   {
-    question: "Was ist die Hauptstadt von Benin?",
-    answers: ["Cotonou", "Porto-Novo", "Parakou", "Abomey"],
-    correct: 1
+    question: "Wie endete das WM Finale 2014 zwischen Deutschland und Argentinien?",
+    answers: ["1:0", "2:1", "1:2", "0:1"],
+    correct: 0
   },
   {
     question: "Wie heißt das größte Nagetier der Welt?",
@@ -13734,8 +14373,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 0
   },
   {
-    question: "Was ist die Hauptstadt von Elfenbeinküste?",
-    answers: ["Abidjan", "Yamoussoukro", "Bouaké", "Daloa"],
+    question: "Wie hoch ist der Eiffelturm (mit Spitze)?",
+    answers: ["300 Meter", "324 Meter", "350 Meter", "400 Meter"],
     correct: 1
   },
   {
@@ -13749,8 +14388,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 1
   },
   {
-    question: "Was ist die Hauptstadt von Liberia?",
-    answers: ["Gbarnga", "Buchanan", "Monrovia", "Harper"],
+    question: "Wie hoch ist die Mehrwertsteuer in Deutschland?",
+    answers: ["7%", "16%", "19%", "21%"],
     correct: 2
   },
   {
@@ -13764,9 +14403,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 1
   },
   {
-    question: "Was ist die Hauptstadt von Sierra Leone?",
-    answers: ["Bo", "Kenema", "Freetown", "Makeni"],
-    correct: 2
+    question: "Welches Land hat die meisten Inseln?",
+    answers: ["Schweden", "Norwegen", "Finnland", "Kanada"],
+    correct: 0
   },
   {
     question: "Wie viele Füße hat ein Tintenfisch?",
@@ -13778,10 +14417,10 @@ const MILLIONAIRE_QUESTIONS = [
     answers: ["Ameisenigel", "Schnabeltier", "Beide", "Keines"],
     correct: 2
   },
-  {
-    question: "Was ist die Hauptstadt von Guinea?",
-    answers: ["Kankan", "Nzérékoré", "Conakry", "Kindia"],
-    correct: 2
+ {
+    question: "Seit wann gibt es den Euro in Deutschland?",
+    answers: ["1999", "2000", "2001", "2002"],
+    correct: 3
   },
   {
     question: "Wie heißt der größte Vogel der Welt?",
@@ -13794,9 +14433,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 1
   },
   {
-    question: "Was ist die Hauptstadt von Gambia?",
-    answers: ["Serekunda", "Brikama", "Banjul", "Bakau"],
-    correct: 2
+    question: "Seit wann gibt es den Euro?",
+    answers: ["1999", "2000", "2001", "2002"],
+    correct: 0
   },
   {
     question: "Wie viele Zähne hat ein Krokodil?",
@@ -13809,8 +14448,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Eritrea?",
-    answers: ["Massawa", "Keren", "Asmara", "Assab"],
+    question: "Wer gewann die UEFA Champions League 2021?",
+    answers: ["Real Madrid", "Manchester City", "Chelsea", "Bayern München"],
     correct: 2
   },
   {
@@ -13824,9 +14463,9 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 2
   },
   {
-    question: "Was ist die Hauptstadt von Dschibuti?",
-    answers: ["Ali Sabieh", "Tadjoura", "Dschibuti", "Obock"],
-    correct: 2
+    question: "Wann wurde die erste PlayStation veröffentlicht?",
+    answers: ["1994", "1995", "1996", "1997"],
+    correct: 0
   },
   {
     question: "Wie viele Tentakel hat eine Qualle normalerweise?",
@@ -13839,8 +14478,8 @@ const MILLIONAIRE_QUESTIONS = [
     correct: 0
   },
   {
-    question: "Was ist die Hauptstadt von Somalia?",
-    answers: ["Hargeisa", "Berbera", "Mogadischu", "Kismayo"],
+    question: "Welche folgende Automarke ist nicht aus Japan",
+    answers: ["Toyota", "Subaru", "Mazda", "Hyundai"],
     correct: 2
   },
   {
@@ -13959,7 +14598,7 @@ const MILLIONAIRE_QUESTIONS = [
   { question: "Was ist die Hauptstadt von Frankreich?", answers: ["Lyon", "Paris", "Marseille", "Toulouse"], correct: 1 },
   { question: "Wie viele Farben hat der Regenbogen?", answers: ["5", "6", "7", "8"], correct: 2 },
   { question: "Welcher Planet ist der größte?", answers: ["Saturn", "Neptune", "Jupiter", "Uranus"], correct: 2 },
-  { question: "Was ist 5 + 3?", answers: ["7", "8", "9", "10"], correct: 1 },
+  { question: "Wie viele Fragen gibt es bei Wer wird Millionär?", answers: ["10", "15", "20", "67"], correct: 1 },
   { question: "Welches Tier ist ein Vogel?", answers: ["Fisch", "Adler", "Frosch", "Schlange"], correct: 1 },
   { question: "Wie viele Seiten hat ein Quadrat?", answers: ["2", "3", "4", "6"], correct: 2 },
   { question: "Was ist die Hauptstadt von Italien?", answers: ["Mailand", "Rom", "Venedig", "Florenz"], correct: 1 },
@@ -18756,53 +19395,6 @@ async function updateAddonsUI() {
 }
 
 // Kaufe Add-On Shop Items
-window.buyShopItem = async function(itemId, itemName) {
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    showNotification("Fehler", "Bitte zuerst einloggen!");
-    return;
-  }
-  
-  let coinsCost = 0;
-  
-  if (itemId === 'gifUnlock') {
-    coinsCost = 1000;
-  } else {
-    showNotification("Fehler", "Unbekanntes Item!");
-    return;
-  }
-  
-  try {
-    // Prüfe ob bereits gekauft
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    const data = userDoc.exists() ? userDoc.data() : {};
-    
-    if (data[itemId]) {
-      showNotification("Info", `Du hast ${itemName} bereits!`);
-      return;
-    }
-    
-    // Prüfe Münzen
-    if (userCoins < coinsCost) {
-      showNotification("Fehler", `Du brauchst ${coinsCost} Münzen! (Du hast: ${userCoins})`);
-      return;
-    }
-    
-    // Ziehe Münzen ab
-    await window.addCoins(-coinsCost);
-    
-    // Speichere Unlock
-    await updateDoc(doc(db, "users", user.uid), {
-      [itemId]: true
-    });
-    
-    showNotification("Erfolg", `🎉 ${itemName} freigeschaltet!`);
-    updateAddonsUI();
-  } catch (err) {
-    console.error("Fehler beim Kauf:", err);
-    showNotification("Fehler", "Kauf fehlgeschlagen: " + err.message);
-  }
-};
 
 
 window.buySilverTrails = async function() {
@@ -21982,12 +22574,6 @@ document.addEventListener("keydown", (e) => {
     setInfo('Live‑Spielplan geladen.');
     for(const f of fixtures){ const li = document.createElement('li'); const dt = f.kickoff ? new Date(f.kickoff) : null; const timeStr = dt ? dt.toLocaleString() : ''; li.textContent = `${f.home} vs ${f.away}${timeStr ? ' – ' + timeStr : ''}`; ul.appendChild(li); }
   }
-  const __origLoad = window.loadMatchday;
-  window.loadMatchday = async function(){
-    const sel = selectEl(); const leagueKey = sel && sel.value ? sel.value : 'EPL'; if(sel && !sel.value){ sel.value = 'EPL'; }
-    const live = await fetchLiveFixtures(leagueKey);
-    if(live && live.length){ renderLive(live); } else { if(typeof __origLoad === 'function'){ __origLoad(); } }
-  };
   document.addEventListener('DOMContentLoaded', () => {
     const refreshBtn = document.getElementById('refreshLocksBtn'); const sel = selectEl();
     if(sel){ sel.addEventListener('change', () => window.loadMatchday()); }
